@@ -14,21 +14,30 @@ USERATSERVER=bfmaier@groot0.biologie.hu-berlin.de
 PYTHONPATH=/usr/local/bin/python2.7
 MEMORY=2G
 
-PARAMLISTSTRING="[alpha, measurements]"
-INTERNALLISTSTRING="[Nmax[:5]]"
-STANDARDLISTSTRING="[corr_matrices[0], y0[4]]"
+PARAMLISTSTRING="\[alpha\,\ measurements\]"
+INTERNALLISTSTRING="\[Nmax\[\:5\]\]"
+STANDARDLISTSTRING="\[corr_matrices\[0\],\ y0\[4\]\]"
+GITREPOS="/home/bfmaier/tau-leaping-for-evolution"
 
 
 #============================== FILENAMES ==============================
 
 cfg:
-	sed "s#NSPECIES#$(NSPECIES)#g" < config_dummy.py > __dummy__
+	sed "s#NMEASUREMENTS#$(NMEASUREMENTS)#g" < config_dummy.py > __dummy__
 	mv __dummy__ config_file.py
-	sed "s#NMEAS#$(NMEASUREMENTS)#g" < config_file.py > __dummy__
+	sed "s#MEMORY#$(MEMORY)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
-	sed "s#NAME#$(BASENAME)#g" < config_file.py > __dummy__
+	sed "s#PYTHONPATH#$(PYTHONPATH)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
-	sed "s#FOLDER#$(FOLDER)#g" < config_file.py > __dummy__
+	sed "s#WDPATH#$(WDPATH)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#PARAMLISTSTRING#$(PARAMLISTSTRING)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#INTERNALLISTSTRING#$(INTERNALLISTSTRING)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#STANDARDLISTSTRING#$(STANDARDLISTSTRING)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#ONLYSAVETIME#$(ONLYSAVETIME)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 
 status:
@@ -36,6 +45,9 @@ status:
 
 statusall:
 	ssh $(USERATSERVER) "qstat -u \"*\""
+
+gitupdateserver:
+	python update_git_repos_server.py $(PYTHONPATH) $(USERATSERVER) $(GITREPOS)
 
 job:
 	make cfg

@@ -4,13 +4,14 @@ import re
 import sys
 
 
-def get_param_lists(pliststr,plist):
+def get_param_lists(pliststr,plist=None):
     if pliststr[-1]=="]" and pliststr[0]=="[":
         try:
             pstring = pliststr[1:-1] #delete first and last character
             array_names = re.sub("[\(\[].*?[\)\]]", "", pstring) #delete array delimiters and what's in between them
             array_names = re.sub(" ", "", array_names).split(',') #delete spaces and get list
-            parameter_list = list(itertools.product(*plist))
+            if plist is not None:
+                parameter_list = list(itertools.product(*plist))
         except:
             print "wrong format in parameter list:", pliststr
             sys.exit(1)
@@ -19,7 +20,22 @@ def get_param_lists(pliststr,plist):
         print "forgot the mandatory brackets around the arrays: [] ?)"
         sys.exit(1)
 
-    return parameter_list, array_names
+    if plist is not None:
+        return array_names, parameter_list
+    else:
+        return array_names
+
+def get_kwargs(plist,pnames,name_to_option):
+    if not (len(pnames)==1 and pnames[0]==""):
+        kwargs = { 
+                   name_to_option[name]:plist[iname]\
+                   for iname,name in itertools.izip(range(len(pnames)),pnames)\
+                   if name_to_option[name] is not None 
+                 }
+    else:
+        kwargs = {}
+
+    return kwargs
 
 
 """
