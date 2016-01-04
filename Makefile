@@ -7,7 +7,7 @@ PRIORITY=1
 ONLYSAVETIME=False
 SEED=1988
 
-NAME=$(BASENAME)_NMEAS_$(NMEAS)_ONLYSAVETIME_$(ONLYSAVETIME)
+NAME=$(BASENAME)_NMEAS_$(NMEASUREMENTS)_ONLYSAVETIME_$(ONLYSAVETIME)
 WDPATH=/home/bfmaier/SSA_symbiosis_fluctuating_fitness/$(NAME)
 LOCALDIR=results_$(NAME)
 
@@ -15,7 +15,7 @@ USERATSERVER=bfmaier@groot0.biologie.hu-berlin.de
 PYTHONPATH=/usr/local/bin/python2.7
 MEMORY=2G
 
-PARAMLISTSTRING="\[alpha\,\ measurements\]"
+PARAMLISTSTRING="\[alpha[3:5]\,\ measurements\]"
 INTERNALLISTSTRING="\[Nmax\[\:2\]\]"
 STANDARDLISTSTRING="\[corr_matrices\[0\],\ y0\[4\]\]"
 GITREPOS="/home/bfmaier/tau-leaping-for-evolution"
@@ -34,8 +34,6 @@ cfg:
 	mv __dummy__ config_file.py
 	sed "s#PYTHONPATH#$(PYTHONPATH)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
-	sed "s#WDPATH#$(WDPATH)#g" < config_file.py > __dummy__
-	mv __dummy__ config_file.py
 	sed "s#PARAMLISTSTRING#$(PARAMLISTSTRING)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#INTERNALLISTSTRING#$(INTERNALLISTSTRING)#g" < config_file.py > __dummy__
@@ -43,6 +41,8 @@ cfg:
 	sed "s#STANDARDLISTSTRING#$(STANDARDLISTSTRING)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#ONLYSAVETIME#$(ONLYSAVETIME)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#WDPATH#$(WDPATH)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 
 status:
@@ -58,7 +58,12 @@ job:
 	make cfg
 	make wrap_every
 	make gitupdateserver
-	ssh $(USERATSERVER) "mkdir -p $(FOLDER); mkdir -p $(FOLDER)/custom_results"
+	ssh $(USERATSERVER) "\
+			mkdir -p $(WDPATH);\
+			mkdir -p $(WDPATH)/custom_results;\
+			mkdir -p $(WDPATH)/results;\
+			mkdir -p $(WDPATH)/output;\
+			"
 	scp -r \
 			simulation.py\
 			wrap_results.py\
@@ -66,23 +71,23 @@ job:
 			job.py \
 			submit_job.py\
 			prepare_param_strings.py \
-		$(USERATSERVER):$(FOLDER)
-	ssh $(USERATSERVER) "cd $(FOLDER); $(PYTHONPATH) submit_job.py"
+		$(USERATSERVER):$(WDPATH)
+	ssh $(USERATSERVER) "cd $(WDPATH); $(PYTHONPATH) submit_job.py"
 
 get_results:
-	make wrap_results
-	scp custom_wrap_results.py $(USERATSERVER):$(FOLDER)
-	ssh $(USERATSERVER) "mkdir -p $(FOLDER)/custom_results/; cd $(FOLDER); $(PYTHONPATH) custom_wrap_results.py"
+	#make wrap_results
+	scp custom_wrap_results.py $(USERATSERVER):$(WDPATH)
+	ssh $(USERATSERVER) "mkdir -p $(WDPATH)/custom_results/; cd $(WDPATH); $(PYTHONPATH) custom_wrap_results.py"
 	mkdir -p $(LOCALDIR)/custom_results/
-	cp custom_wrap_results.py 
-	scp $(USERATSERVER):$(FOLDER)/custom_results/* $(LOCALDIR)/custom_results/
+	cp custom_wrap_results.py $(LOCALDIR) 
+	scp $(USERATSERVER):$(WDPATH)/custom_results/* $(LOCALDIR)/custom_results/
 
 wrap_results:
-	ssh $(USERATSERVER) "cd $(FOLDER); $(PYTHONPATH) wrap_results.py"
+	ssh $(USERATSERVER) "cd $(WDPATH); $(PYTHONPATH) wrap_results.py"
 
 get_all_results:
 	make wrap_results
-	scp $(USERATSERVER):$(FOLDER)/*.p $(LOCALDIR)
+	scp $(USERATSERVER):$(WDPATH)/*.p $(LOCALDIR)
 
 wrap_every:
 	mkdir -p $(LOCALDIR)

@@ -5,4 +5,4 @@ def simulation_code(kwargs):
     sim = fluctuating_fitness_SSA(**kwargs)
     sim.simulate()
 
-    return None
+    return sim.current_N.argmax()

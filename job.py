@@ -38,7 +38,7 @@ for ip,internal_params in izip(xrange(len(cf.internal_parameter_list)),cf.intern
     
 #save results
 if any([result is not None for result in results]) and not cf.only_save_times:
-    pickle.dump(results,open(cf.resultpath+'/results_%d.pickle' % (j),'w'),protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(results,open(cf.resultpath+'/results_%d.p' % (j),'w'),protocol=pickle.HIGHEST_PROTOCOL)
 
 #save times needed
-pickle.dump(times,open(cf.resultpath+'/times_%d.pickle' % (j),'w'),protocol=pickle.HIGHEST_PROTOCOL)
+pickle.dump(times,open(cf.resultpath+'/times_%d.p' % (j),'w'),protocol=pickle.HIGHEST_PROTOCOL)
