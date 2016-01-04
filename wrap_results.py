@@ -23,7 +23,6 @@ for j in range(cf.jmax+1):
     for i in range(len(res)):
         icoords = [ [c] for c in list(unravel_index(i, idims)) ]
         times[pcoords+icoords] = time[i]
-        print times[pcoords+icoords], time[i]
         if not cf.only_save_times:
             results[pcoords+icoords] = res[i]
 
