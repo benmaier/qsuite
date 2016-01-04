@@ -25,7 +25,7 @@ def prepare_results(res):
 
 times = pickle.load(open(cf.resultpath+"/times.p",'r'))
 time,err = mean_and_err(array(times))
-savez(cf.path+"/custom_results/mean_err_times.npz",times,err)
+savez(cf.path+"/custom_results/mean_err_times.npz",time,err)
 
 if not cf.only_save_times:
     results = pickle.load(open(cf.resultpath+"/results.p",'r'))

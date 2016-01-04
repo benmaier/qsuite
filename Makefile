@@ -75,7 +75,7 @@ job:
 	ssh $(USERATSERVER) "cd $(WDPATH); $(PYTHONPATH) submit_job.py"
 
 get_results:
-	#make wrap_results
+	make wrap_results
 	scp custom_wrap_results.py $(USERATSERVER):$(WDPATH)
 	ssh $(USERATSERVER) "mkdir -p $(WDPATH)/custom_results/; cd $(WDPATH); $(PYTHONPATH) custom_wrap_results.py"
 	mkdir -p $(LOCALDIR)/custom_results/
