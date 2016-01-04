@@ -10,6 +10,6 @@ jobscript = """
 
 %s %s/job.py $SGE_TASK_ID""" % (cf.jmin,cf.jmax,cf.memory,cf.pythonpath,cf.path)
 
-jobfname = cf.path+"/job.sh"
+jobfname = cf.path+"/"+cf.name+".sh"
 open(jobfname,'w').write(jobscript).close()
 os.system("chmod +x "+jobfname+"; qsub "+jobfname)

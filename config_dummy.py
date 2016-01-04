@@ -37,6 +37,7 @@ memory = "MEMORY"
 pythonpath = "PYTHONPATH"
 path = "WDPATH"
 resultpath = path+"/results"
+name = "NAME"
 
 #set parameter settings
 #which parameters are taken care of on the cluster

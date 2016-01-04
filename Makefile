@@ -27,6 +27,8 @@ cfg:
 	mv __dummy__ config_file.py
 	sed "s#MEMORY#$(MEMORY)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
+	sed "s#NAME#$(BASENAME)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
 	sed "s#PYTHONPATH#$(PYTHONPATH)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#WDPATH#$(WDPATH)#g" < config_file.py > __dummy__
