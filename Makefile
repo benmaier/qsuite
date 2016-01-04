@@ -2,7 +2,7 @@
 SHELL=/bin/bash
 
 BASENAME=symbSSA
-NMEASUREMENTS=10
+NMEASUREMENTS=30
 PRIORITY=1
 ONLYSAVETIME=False
 SEED=1988
@@ -15,8 +15,8 @@ USERATSERVER=bfmaier@groot0.biologie.hu-berlin.de
 PYTHONPATH=/usr/local/bin/python2.7
 MEMORY=2G
 
-PARAMLISTSTRING="\[alpha[3:5]\,\ measurements\]"
-INTERNALLISTSTRING="\[Nmax\[\:2\]\]"
+PARAMLISTSTRING="\[alpha\,\ measurements\]"
+INTERNALLISTSTRING="\[Nmax\]"
 STANDARDLISTSTRING="\[corr_matrices\[0\],\ y0\[4\]\]"
 GITREPOS="/home/bfmaier/tau-leaping-for-evolution"
 
