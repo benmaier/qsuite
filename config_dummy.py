@@ -40,6 +40,9 @@ path = "WDPATH"
 resultpath = path+"/results"
 name = "NAME"
 
+#set queueing architecture
+queue = "QUEUESYS"
+
 #set parameter settings
 #which parameters are taken care of on the cluster
 pliststr = "PARAMLISTSTRING"

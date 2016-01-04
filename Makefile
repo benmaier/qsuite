@@ -20,6 +20,8 @@ INTERNALLISTSTRING="\[Nmax\]"
 STANDARDLISTSTRING="\[corr_matrices\[0\],\ y0\[4\]\]"
 GITREPOS="/home/bfmaier/tau-leaping-for-evolution"
 
+QUEUESYS=PBS
+
 
 #============================== FILENAMES ==============================
 
@@ -27,6 +29,8 @@ cfg:
 	sed "s#NMEASUREMENTS#$(NMEASUREMENTS)#g" < config_dummy.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#MEMORY#$(MEMORY)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#QUEUESYS#$(QUEUESYS)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#NAME#$(BASENAME)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
