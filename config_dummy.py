@@ -30,8 +30,9 @@ name_to_option = {
 
 #============================== GENERAL CONFIGS =================================
 
-#set memory
+#set memory and seed for RNG
 memory = "MEMORY"
+seed = "SEED"
 
 #set paths
 pythonpath = "PYTHONPATH"

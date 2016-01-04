@@ -5,17 +5,18 @@ BASENAME=symbSSA
 NMEASUREMENTS=10
 PRIORITY=1
 ONLYSAVETIME=False
+SEED=1988
 
 NAME=$(BASENAME)_NMEAS_$(NMEAS)_ONLYSAVETIME_$(ONLYSAVETIME)
 WDPATH=/home/bfmaier/SSA_symbiosis_fluctuating_fitness/$(NAME)
-LOCALDIR=$(NAME)
+LOCALDIR=results_$(NAME)
 
 USERATSERVER=bfmaier@groot0.biologie.hu-berlin.de
 PYTHONPATH=/usr/local/bin/python2.7
 MEMORY=2G
 
 PARAMLISTSTRING="\[alpha\,\ measurements\]"
-INTERNALLISTSTRING="\[Nmax\[\:5\]\]"
+INTERNALLISTSTRING="\[Nmax\[\:2\]\]"
 STANDARDLISTSTRING="\[corr_matrices\[0\],\ y0\[4\]\]"
 GITREPOS="/home/bfmaier/tau-leaping-for-evolution"
 
@@ -28,6 +29,8 @@ cfg:
 	sed "s#MEMORY#$(MEMORY)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#NAME#$(BASENAME)#g" < config_file.py > __dummy__
+	mv __dummy__ config_file.py
+	sed "s#SEED#$(SEED)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
 	sed "s#PYTHONPATH#$(PYTHONPATH)#g" < config_file.py > __dummy__
 	mv __dummy__ config_file.py
@@ -53,36 +56,42 @@ gitupdateserver:
 
 job:
 	make cfg
-	make jobfile
 	make wrap_every
-	ssh $(USERATSERVER) "rm -r $(FOLDER)/jobscripts; mkdir -p $(FOLDER)"
+	make gitupdateserver
+	ssh $(USERATSERVER) "mkdir -p $(FOLDER); mkdir -p $(FOLDER)/custom_results"
 	scp -r \
-			symbiosis_sim.py\
-			fluctuating_growth_simulator.py\
+			simulation.py\
+			wrap_results.py\
 			config_file.py\
-			wrapper_for_cluster.py \
-			make_and_submit_jobs.sh \
+			job.py \
+			submit_job.py\
+			prepare_param_strings.py \
 		$(USERATSERVER):$(FOLDER)
-	ssh $(USERATSERVER) "\
-			cd $(FOLDER);\
-		    ls;\
-			chmod +x ./make_and_submit_jobs.sh;\
-			./make_and_submit_jobs.sh"
+	ssh $(USERATSERVER) "cd $(FOLDER); $(PYTHONPATH) submit_job.py"
 
 get_results:
-	ssh $(USERATSERVER) "cd $(FOLDER); /usr/local/bin/python2.7 wrapper_for_cluster.py"
-	#make wrap_every
+	make wrap_results
+	scp custom_wrap_results.py $(USERATSERVER):$(FOLDER)
+	ssh $(USERATSERVER) "mkdir -p $(FOLDER)/custom_results/; cd $(FOLDER); $(PYTHONPATH) custom_wrap_results.py"
+	mkdir -p $(LOCALDIR)/custom_results/
+	cp custom_wrap_results.py 
+	scp $(USERATSERVER):$(FOLDER)/custom_results/* $(LOCALDIR)/custom_results/
+
+wrap_results:
+	ssh $(USERATSERVER) "cd $(FOLDER); $(PYTHONPATH) wrap_results.py"
+
+get_all_results:
+	make wrap_results
 	scp $(USERATSERVER):$(FOLDER)/*.p $(LOCALDIR)
-	#scp $(USERATSERVER):$(FOLDER)/wrapper* .
 
 wrap_every:
 	mkdir -p $(LOCALDIR)
 	cp \
-			symbiosis_sim.py\
-			fluctuating_growth_simulator.py\
+			simulation.py\
 			config_file.py\
-			wrapper_for_cluster.py \
-			make_and_submit_jobs.sh\
+			wrap_results.py \
+			custom_wrap_results.py\
+			prepare_param_strings.py \
 	 $(LOCALDIR)/
 
 clean:
