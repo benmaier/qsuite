@@ -1,26 +1,28 @@
 #============================== DEFINITIONS ============================
 SHELL=/bin/bash
 
-BASENAME=symbSSA
-NMEASUREMENTS=30
+BASENAME=projecttitle
+NMEASUREMENTS=10
 PRIORITY=1
 ONLYSAVETIME=False
-SEED=1988
+SEED=1337
 
 NAME=$(BASENAME)_NMEAS_$(NMEASUREMENTS)_ONLYSAVETIME_$(ONLYSAVETIME)
-WDPATH=/home/bfmaier/SSA_symbiosis_fluctuating_fitness/$(NAME)
+WDPATH=/path/at/server/$(NAME)
 LOCALDIR=results_$(NAME)
 
-USERATSERVER=bfmaier@groot0.biologie.hu-berlin.de
-PYTHONPATH=/usr/local/bin/python2.7
-MEMORY=2G
+USERATSERVER=username@server.com
+PYTHONPATH=/serverpath/to/usr/bin/python
+MEMORY=1G
 
-PARAMLISTSTRING="\[alpha\,\ measurements\]"
-INTERNALLISTSTRING="\[Nmax\]"
-STANDARDLISTSTRING="\[corr_matrices\[0\],\ y0\[4\]\]"
-GITREPOS="/home/bfmaier/tau-leaping-for-evolution"
+#in the following, empty would be ok too, which would be represented as \[\]
+#the parameters should be defined in "config_dummy.py"
+PARAMLISTSTRING=\[params0\[2\:4\],\ params1\[\:-1\],\ measurements\]
+INTERNALLISTSTRING=\[params2,\ params3\[4:0:-1\]\]
+STANDARDLISTSTRING=\[params4\[0\],\ params5\[2\]\]
+GITREPOS=/path/to/repo1 /path/to/repo2
 
-QUEUESYS=PBS
+QUEUESYS=PBS #or SGE
 
 
 #============================== FILENAMES ==============================
@@ -79,7 +81,7 @@ job:
 	ssh $(USERATSERVER) "cd $(WDPATH); $(PYTHONPATH) submit_job.py"
 
 get_results:
-	make wrap_results
+	#make wrap_results
 	scp custom_wrap_results.py $(USERATSERVER):$(WDPATH)
 	ssh $(USERATSERVER) "mkdir -p $(WDPATH)/custom_results/; cd $(WDPATH); $(PYTHONPATH) custom_wrap_results.py"
 	mkdir -p $(LOCALDIR)/custom_results/

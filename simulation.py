@@ -1,8 +1,10 @@
-from tauleapevo import fluctuating_fitness_SSA
+#change the following according to your needs
+from your_simulation_module import your_simulation_function
 
 def simulation_code(kwargs):
 
-    sim = fluctuating_fitness_SSA(**kwargs)
-    sim.simulate()
+    result = your_simulation_function(**kwargs)
 
-    return sim.current_N.argmax()
+    #do stuff with the result
+
+    return result

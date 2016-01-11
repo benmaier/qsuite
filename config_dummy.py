@@ -4,28 +4,24 @@ from itertools import izip
 
 #==================================== SIMULATION SPECIFIC DETAILS ============================
 #declare parameters
-Nsp = 3 #number of species
-NWi = 2 #number of Wiener processes
-C = zeros([Nsp,NWi])
-C[0,0] = 1
-C[1,1] = 1
-C[2,0] = 1
-C[2,1] = 1
-corr_matrices = [ C ]
-x0 = [ [(1-x0)/2.,(1-x0)/2., x0] for x0 in linspace(0.05,0.95,19,endpoint=True)]
-y0 = array([ .1, .2, .4, .8, 1., 1.5, 2., 3. ])
-alpha = array([ 0, .1, .2, .4, .8, 1., 1.5, 2., 3. ])
-Nmax = 9 * 2**arange(7)
-measurements = range(NMEASUREMENTS)
+params0 = arange(10)
+params1 = arange(10)
+params2 = arange(10)
+params3 = arange(10)
+params4 = arange(10)
+params5 = arange(10)
+measurements = arange(NMEASUREMENTS)
 
-#dict mapping the name of an array above to the option needed in "simulation.py"
+
+#dict mapping the name of an array above to the option name needed in "simulation.py"
 name_to_option = { 
-                   "corr_matrices": "correlation_matrix",
-                   "y0": "y0",
-                   "alpha": "alpha",
-                   "Nmax": "Nmax",
-                   "x0": "x0",
-                   "measurements": None,
+                   "params0": "parameter_0",
+                   "params1": "parameter_1",
+                   "params2": "parameter_2",
+                   "params3": "parameter_3",
+                   "params4": "parameter_4",
+                   "params5": "parameter_5",
+                   "measurements": None, #this is not going to be converted to a keyword argument
                  }
 
 #============================== GENERAL CONFIGS =================================
