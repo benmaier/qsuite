@@ -16,7 +16,7 @@ PYTHONPATH=/serverpath/to/usr/bin/python
 MEMORY=1G
 
 #in the following, empty would be ok too, which would be represented as \[\]
-#the parameters should be defined in "config_dummy.py"
+#the parameter arrays (params0, params1, ...) have to be defined in "config_dummy.py"
 PARAMLISTSTRING=\[params0\[2\:4\],\ params1\[\:-1\],\ measurements\]
 INTERNALLISTSTRING=\[params2,\ params3\[4:0:-1\]\]
 STANDARDLISTSTRING=\[params4\[0\],\ params5\[2\]\]
@@ -58,6 +58,7 @@ statusall:
 	ssh $(USERATSERVER) "qstat -u \"*\""
 
 gitupdateserver:
+	cd queuesys
 	python update_git_repos_server.py $(PYTHONPATH) $(USERATSERVER) $(GITREPOS)
 
 job:
@@ -72,12 +73,15 @@ job:
 			"
 	scp -r \
 			simulation.py\
-			wrap_results.py\
 			config_file.py\
+		$(USERATSERVER):$(WDPATH)
+	cd queuesys
+	scp \
+			wrap_results.py\
 			job.py \
 			submit_job.py\
-			prepare_param_strings.py \
 		$(USERATSERVER):$(WDPATH)
+	cd ..
 	ssh $(USERATSERVER) "cd $(WDPATH); $(PYTHONPATH) submit_job.py"
 
 get_results:
@@ -100,10 +104,8 @@ wrap_every:
 	cp \
 			simulation.py\
 			config_file.py\
-			wrap_results.py \
 			custom_wrap_results.py\
-			prepare_param_strings.py \
 	 $(LOCALDIR)/
 
 clean:
-	rm -rf *# *~ ./jobscripts/*
+	rm -rf *.pyc *.# *~ ./jobscripts/*

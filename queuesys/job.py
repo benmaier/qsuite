@@ -4,7 +4,6 @@ import time
 import cPickle as pickle
 import simulation as simcode
 from itertools import izip
-from prepare_param_strings import *
 
 #get job number and alternatively another resultpath
 args = sys.argv[1:]
@@ -13,7 +12,7 @@ if len(args)>1:
     cf.resultpath = args[1] 
 
 #get kwargs for the simulation of this jobnumber
-job_kwargs = get_kwargs(cf.parameter_list[j],cf.parameter_names,cf.name_to_option)
+job_kwargs = cf.get_kwargs(cf.parameter_list[j],cf.parameter_names,cf.name_to_option)
 
 #prepare result lists
 results = [ None for i in xrange(len(cf.internal_parameter_list)) ]
@@ -23,7 +22,7 @@ times = list(results) #copy
 for ip,internal_params in izip(xrange(len(cf.internal_parameter_list)),cf.internal_parameter_list):
 
     #wrap all kwargs necessary for the simulation
-    kwargs = get_kwargs(cf.internal_parameter_list[ip],cf.internal_names,cf.name_to_option)
+    kwargs = cf.get_kwargs(cf.internal_parameter_list[ip],cf.internal_names,cf.name_to_option)
     kwargs.update(job_kwargs)
     kwargs.update(cf.std_kwargs)
     
