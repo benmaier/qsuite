@@ -8,8 +8,8 @@ pdims = [ len(p) for p in cf.plist ]
 idims = [ len(p) for p in cf.ilist ]
 
 #prepare result arrays
-results = empty(pdims+idims,dtype=object)
-times = empty(pdims+idims,dtype=object)
+results = empty(pdims+idims,dtype=object).flatten()
+times = empty(pdims+idims,dtype=object).flatten()
 
 #wrap results of the simulations
 for j in range(cf.jmax+1):
@@ -19,16 +19,18 @@ for j in range(cf.jmax+1):
     time = pickle.load(open(cf.resultpath+"/times_%d.p" % j,'r'))
     if not cf.only_save_times:
         res = pickle.load(open(cf.resultpath+"/results_%d.p" % j,'r'))
+        #print res
         
     for i in range(len(res)):
         icoords = [ [c] for c in list(unravel_index(i, idims)) ]
-        times[pcoords+icoords] = time[i]
+        flat_index = ravel_multi_index(pcoords+icoords,pdims+idims)
+        times[flat_index] = time[i]
         if not cf.only_save_times:
-            results[pcoords+icoords] = res[i]
+            results[flat_index] = res[i]
 
 #convert to lists for better portability
-times = times.tolist()
-results = results.tolist()
+times = times.reshape(pdims+idims).tolist()
+results = results.reshape(pdims+idims).tolist()
 
 #save the wrapped data
 pickle.dump(times,open(cf.resultpath+"/times.p",'w'))
