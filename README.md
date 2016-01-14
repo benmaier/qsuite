@@ -13,3 +13,5 @@ Oftentimes different array jobs on clusters have the same framework. You have to
 This file holds the function that will get called to start a single simulation with a fixed combination of parameters and a seed. So, this is where your research happens. If you want, you can write all your project's code in this single file. However, I recommend setting up a different repository containing your simulation code and updating it on the server every time you start an array job. The parameters are passed to the function ``simulation_code`` in a ``kwargs`` dictionary and can then get used to do whatever you want to do with it. In the end, every simulation has a result. This result can be wrapped in whatever container you prefer and returned. The computation suite will store it in a ``pickle`` and wrap it up once all jobs are computed.
 
 ### ``config_dummy.py``
+
+version 1
