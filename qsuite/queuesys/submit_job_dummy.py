@@ -2,8 +2,9 @@ import config_file as cf
 import os
 import sys
 
+"""
 if cf.queue=="SGE":
-    jobscript = """
+    jobscript = \"\"\"
 #!/bin/bash
 #$ -V
 #$ -cwd
@@ -14,7 +15,7 @@ if cf.queue=="SGE":
 
 # Bash arrays use zero-based indexing but you CAN'T use #$ -t 0-9 (0 is an invalid task id)
 INDEX=$((SGE_TASK_ID-1))
-%s %s/job.py $INDEX""" % (\
+%s %s/job.py $INDEX\"\"\" % (\
                             cf.memory,
                             cf.jmin+1,
                             cf.jmax+1,
@@ -23,7 +24,7 @@ INDEX=$((SGE_TASK_ID-1))
                             cf.pythonpath,
                             cf.path)
 elif cf.queue=="PBS":
-    jobscript = """
+    jobscript = \"\"\"
 #!/bin/bash
 #taken from http://www.uibk.ac.at/zid/systeme/hpc-systeme/common/tutorials/pbs-howto.html#HDR1_1
 #PBS -l ncpus=1
@@ -40,7 +41,7 @@ elif cf.queue=="PBS":
 cd $PBS_O_WORKDIR
 
 INDEX=$((PBS_ARRAY_INDEX-1))
-%s %s/job.py $INDEX""" % (\
+%s %s/job.py $INDEX\"\"\" % (\
                             cf.memory,
                             cf.jmin+1,
                             cf.jmax+1,
@@ -51,6 +52,17 @@ INDEX=$((PBS_ARRAY_INDEX-1))
 else:
     print "Queueing architecture " + cf.queue + " unknown"
     sys.exit(1)
+"""
+
+jobscript = JOBSCRIPT % (\
+            cf.memory,
+            cf.jmin+1,
+            cf.jmax+1,
+            cf.path+"/output",
+            cf.path+"/output",
+            cf.pythonpath,
+            cf.path,
+            )
 
 print jobscript
 jobfname = cf.path+"/"+cf.name+".sh"
