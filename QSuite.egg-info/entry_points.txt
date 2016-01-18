@@ -1,3 +1,0 @@
-[console_scripts]
-qsuite = qsuite.qsuite_binary:main
-
