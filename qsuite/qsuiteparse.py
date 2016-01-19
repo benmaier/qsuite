@@ -1,5 +1,8 @@
+from __future__ import print_function
 import sys
 import qsuite
+import os
+import ast
 
 if sys.version_info[0] == 2:
     import ConfigParser as cp
@@ -42,10 +45,11 @@ def set_in_qsuite(qsuiteparser,qsuitefile,mode,set_to_thing):
         if mode == "add":
             add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
 
-            if add_files[0] == ['']:
+            if add_files[0] == '':
                 add_files.pop(0)    
 
             add_files.append(set_to_thing)
+            add_files = list(set(add_files))
             set_to_thing = add_files
 
         qsuiteparser.set('Files',opt,set_to_thing)
