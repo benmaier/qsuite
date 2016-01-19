@@ -2,5 +2,5 @@ customdir = "~/.qsuite"
 
 from .qconfig import *
 from .template import *
-from .qsuiteparser import *
+from .qsuiteparse import *
 

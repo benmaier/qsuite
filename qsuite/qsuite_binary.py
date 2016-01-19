@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import sys
 import qsuite
@@ -7,8 +8,9 @@ from qsuite import get_template_file
 from qsuite import copy_template
 from qsuite import set_default_file 
 from qsuite import get_qsuite
+from qsuite import set_in_qsuite
+from qsuite import rm_in_qsuite
 from qsuite import write_qsuite
-from qsuite import customdir
 
 
 
@@ -26,6 +28,11 @@ def update_git(cf):
     os.system(repostring)
 
 
+def init(qsuitefile,opts):
+    qsuiteparser = get_qsuite(qsuitefile,init=True)
+    copy_template("config",opts)
+    copy_template("simulation",opts)
+    write_qsuite(qsuiteparser,qsuitefile)
 
 
 def main():
@@ -47,17 +54,23 @@ def main():
     qsuiteparser = None
 
     if cmd in ["init","initialize"]:
-        if not os.path.exists(qsuitefile) or '-f' in opts:
-            qsuiteparser = get_qsuite(qsuitefile,init=True)
-            copy_template("config",opts)
-            copy_template("simulation",opts)
-            sys.exit(0)
-        elif len(args)>1 and args[1] in ["customwrap", "customwrapper"]:
-            copy_template("customwrap",opts)
-            sys.exit(0)
-        else:
-            print("There's still a .qsuite file carrying configurations. Remove this file first or use the '-f' flag to force the initialization.")
-            sys.exit(1)
+        if len(args)==1:
+            if not os.path.exists(qsuitefile):
+                init(qsuitefile,opts)
+                sys.exit(0)
+            else:
+                yn = raw_input("There's already a .qsuite file carrying configurations. Do you want to override it (y/n)? ")
+                yn = yn.lower()[0]
+                if yn == "y":
+                    init(qsuitefile,opts)
+                sys.exit(0)
+        elif len(args)>1:
+            if args[1] in ["customwrap", "customwrapper"]:
+                copy_template("customwrap",opts)
+                sys.exit(0)
+            else:
+                print("Unknown option",args[1])
+                sys.exit(1)
 
     qsuiteparser = get_qsuite(qsuitefile)
 
@@ -68,20 +81,13 @@ def main():
             set_to_thing = args[2]
 
             if thing_to_set in ["cfg", "config", "configuration"]:
-                qsuiteparser.set('Files','config',set_to_thing)
-                write_qsuite(qsuiteparser,qsuitefile)
-
+                set_in_qsuite(qsuiteparser,qsuitefile,"config",set_to_thing)
             elif thing_to_set in ["sim", "simulation"]:
-                qsuiteparser.set('Files','simulation',set_to_thing)
-                write_qsuite(qsuiteparser,qsuitefile)
-
+                set_in_qsuite(qsuiteparser,qsuitefile,"simulation",set_to_thing)
             elif thing_to_set in ["customwrap", "customwrapper"]:
-                qsuiteparser.set('Files','customwrap',set_to_thing)
-                write_qsuite(qsuiteparser,qsuitefile)
-
+                set_in_qsuite(qsuiteparser,qsuitefile,"customwrap",set_to_thing)
             elif thing_to_set in ["exec", "execute", "exe"]:
-                qsuiteparser.set('Files','execute_after_scp',set_to_thing)
-                write_qsuite(qsuiteparser,qsuitefile)
+                set_in_qsuite(qsuiteparser,qsuitefile,"exec",set_to_thing)
 
             elif thing_to_set.startswith("default"):
                 if len(args)>2:
@@ -108,24 +114,21 @@ def main():
 
         if len(args)>1:
             thing_to_set = args[1]
-
-            add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
-            add_files.append(thing_to_set)
-            qsuiteparser.set('Files','additional_files')
-            write_qsuite(qsuiteparser,qsuitefile)
+            set_in_qsuite(qsuiteparser,qsuitefile,"add",thing_to_set)
+            sys.exit(0)
         else:
             print("Nothing to add!")
             sys.exit(1)
 
     elif cmd in ["rm"]:
         if len(args)>1:
-            thing_to_set = args[1]
+            rm_in_qsuite(qsuiteparser,qsuitefile,args[1])
+        else:
+            print("Nothing to remove!")
+            sys.exit(1)
 
-            add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
-            add_files.append(thing_to_set)
 
-
-    configfile = qsuiteparser('Files','config')
+    configfile = qsuiteparser.get('Files','config')
     if not os.path.exists(configfile):
         configfile = os.path.join(os.getcwd(),configfile)
 

@@ -19,12 +19,12 @@ external_parameters = [
                         ( None   , measurements ),
                       ]
 internal_parameters = [
-                        ('p3', p3[:1]),
-                        ('p3', p4[:]),
+                        ('p3', params3[:1]),
+                        ('p3', params4[:]),
                       ]
 standard_parameters = [
-                        ( 'p5', p5[1] ),
-                        ( 'p6', p6[2] ),
+                        ( 'p5', params5[1] ),
+                        ( 'p6', params6[2] ),
                       ]
 
 only_save_times = False

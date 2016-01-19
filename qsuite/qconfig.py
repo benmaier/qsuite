@@ -30,7 +30,7 @@ class qconfig(object):
 
         #get min and max jobnumber
         self.jmin = 0
-        self.jmax = len(parameter_list)-1
+        self.jmax = len(self.parameter_list)-1
 
     #======================== INHERIT PROPERTIES FROM THE CONFIG FILE ============================
 
