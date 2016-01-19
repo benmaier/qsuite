@@ -9,6 +9,7 @@ from qsuite import copy_template
 from qsuite import set_default_file 
 from qsuite import get_qsuite
 from qsuite import write_qsuite
+from qsuite import customdir
 
 
 
@@ -28,17 +29,21 @@ def update_git(cf):
 
 
 
-
 def main():
+    
+    #create the custom dir if it doesn't exist yet
 
     if len(sys.argv)==1:
         print("Yes, I'm here! Give me a command!")
         sys.exit(1)
 
-    args = sys.argv[1:]
+    args = [ a for a in sys.argv[1:] if not a.startswith("-") ]
+    opts = [ a for a in sys.argv[1:] if a.startswith("-") ]
+
     cmd = args[0]
     cwd = os.getcwd()
     qsuitefile = os.path.join(cwd,".qsuite")
+
     cf = None
     qsuiteparser = None
 
@@ -81,6 +86,7 @@ def main():
 
             elif thing_to_set.startswith("default"):
                 if len(args)>2:
+
                     file_to_set = args[3]
 
                     if thing_to_set in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:

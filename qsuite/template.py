@@ -3,6 +3,10 @@ import os
 import sys
 import qsuite
 
+def mkdirp_customdir():
+    if not os.path.exists(qsuite.customdir):
+        os.makedirs(qsuite.customdir)
+
 def get_template_file(filename):
 
     #check if there exists a custom template
@@ -49,6 +53,8 @@ def set_default_file(mode,sourcefile):
     else:
         print("copy_template(): no such mode as", mode)
         sys.exit(1)
+
+    mkdirp_customdir()
 
     potential_file = os.join(qsuite.customdir,filename)
     copy_file = True
