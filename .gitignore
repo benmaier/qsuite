@@ -9,3 +9,5 @@
 /build/
 /bin/
 /test/
+
+.DS_Store
