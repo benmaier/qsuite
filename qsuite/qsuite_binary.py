@@ -24,8 +24,10 @@ def update_git(cf):
         repostring += "cd %s; git fetch; git pull; %s; " % tuple(repo)
 
     repostring += '"'
-    print(" ===",repostring)
-    os.system(repostring)
+
+    if len(cf.git_repos)>0 :
+        print(" ===",repostring)
+        os.system(repostring)
 
 
 def init(qsuitefile,opts):
@@ -135,7 +137,7 @@ def main():
     cf = qconfig(configfile)
 
     if cmd in ["git","gitupdate","git_update","updategit","update_git"]:
-        update_git()
+        update_git(cf)
     else:
         pass
 
