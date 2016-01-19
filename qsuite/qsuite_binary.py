@@ -2,7 +2,6 @@ import os
 import sys
 import qsuite
 from qsuite import qconfig
-import ConfigParser
 import ast
 from qsuite import get_template_file
 from qsuite import copy_template
@@ -20,10 +19,10 @@ def update_git(cf):
 
     repostring = 'ssh ' + cf.useratserver + ' "'
     for repo in cf.git_repos:
-        repostring += "cd %s; git fetch; git pull; %s " % tuple(repo)
+        repostring += "cd %s; git fetch; git pull; %s; " % tuple(repo)
 
     repostring += '"'
-    print("===",repostring)
+    print(" ===",repostring)
     os.system(repostring)
 
 
@@ -48,16 +47,16 @@ def main():
     qsuiteparser = None
 
     if cmd in ["init","initialize"]:
-        if not os.path.exists(qsuitefile):
+        if not os.path.exists(qsuitefile) or '-f' in opts:
             qsuiteparser = get_qsuite(qsuitefile,init=True)
-            copy_template("config")
-            copy_template("simulation")
+            copy_template("config",opts)
+            copy_template("simulation",opts)
             sys.exit(0)
         elif len(args)>1 and args[1] in ["customwrap", "customwrapper"]:
-            copy_template("customwrap")
+            copy_template("customwrap",opts)
             sys.exit(0)
         else:
-            print("There's still a .qsuite file carrying configurations. Remove this file first.")
+            print("There's still a .qsuite file carrying configurations. Remove this file first or use the '-f' flag to force the initialization.")
             sys.exit(1)
 
     qsuiteparser = get_qsuite(qsuitefile)
@@ -117,6 +116,13 @@ def main():
         else:
             print("Nothing to add!")
             sys.exit(1)
+
+    elif cmd in ["rm"]:
+        if len(args)>1:
+            thing_to_set = args[1]
+
+            add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
+            add_files.append(thing_to_set)
 
 
     configfile = qsuiteparser('Files','config')

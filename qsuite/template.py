@@ -20,7 +20,7 @@ def get_template_file(filename):
 
 
 
-def copy_template(mode):
+def copy_template(mode,options=[]):
 
     if mode == "config":
         filename = "qsuite_config.py"
@@ -38,7 +38,12 @@ def copy_template(mode):
     targetfile = os.path.join(os.getcwd(),filename)
 
     #copy template to cwd
-    shutil.copy2(sourcefile,targetfile)
+    if not os.path.exists(targetfile) or "-f" in options:
+        shutil.copy2(sourcefile,targetfile)
+        print("Initialized",mode,"as",filename)
+    else:
+        print("The file",filename,"already exists. Remove it first or use the '-f' flag to force copying the template.")
+
 
 
 
