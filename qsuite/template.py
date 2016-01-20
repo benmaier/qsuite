@@ -62,7 +62,7 @@ def set_default_file(mode,sourcefile):
 
     mkdirp_customdir()
 
-    potential_file = os.join(qsuite.customdir,filename)
+    potential_file = os.path.join(qsuite.customdir,filename)
     copy_file = True
 
     if os.path.exists(potential_file):

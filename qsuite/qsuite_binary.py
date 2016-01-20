@@ -73,6 +73,10 @@ def main():
             else:
                 print("Unknown option",args[1])
                 sys.exit(1)
+    elif not os.path.exists(os.path.join(cwd,".qsuite")):
+        #if there's no ".qsuite" file yet, stop operating
+        print("Not initialized yet!")
+        sys.exit(1)
 
     qsuiteparser = get_qsuite(qsuitefile)
 
@@ -94,7 +98,7 @@ def main():
             elif thing_to_set.startswith("default"):
                 if len(args)>2:
 
-                    file_to_set = args[3]
+                    file_to_set = args[2]
 
                     if thing_to_set in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:
                         set_default_file("config",file_to_set)
@@ -115,7 +119,7 @@ def main():
     elif cmd in ["add"]:
 
         if len(args)>1:
-            thing_to_set = args[1]
+            thing_to_set = args[1:]
             set_in_qsuite(qsuiteparser,qsuitefile,"add",thing_to_set)
             sys.exit(0)
         else:
@@ -124,7 +128,8 @@ def main():
 
     elif cmd in ["rm"]:
         if len(args)>1:
-            rm_in_qsuite(qsuiteparser,qsuitefile,args[1])
+            thing_to_set = args[1:]
+            rm_in_qsuite(qsuiteparser,qsuitefile,thing_to_set)
         else:
             print("Nothing to remove!")
             sys.exit(1)

@@ -41,14 +41,26 @@ def set_in_qsuite(qsuiteparser,qsuitefile,mode,set_to_thing):
         print("Unkown mode:",mode)
         sys.exit(1)
 
-    if os.path.exists(set_to_thing):
+    if type(set_to_thing) in [list,tuple]:
+        stuff_exists = True
+        for fname in set_to_thing:
+            this_exists = os.path.exists(fname)
+            stuff_exists = stuff_exists and this_exists
+            if not this_exists:
+                print("File", set_to_thing,"doesn't exist.")
+        if not stuff_exists:
+            sys.exit(1)
+    else:
+        stuff_exists = os.path.exists(set_to_thing)
+
+    if stuff_exists:
         if mode == "add":
             add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
 
             if add_files[0] == '':
                 add_files.pop(0)    
 
-            add_files.append(set_to_thing)
+            add_files.extend(set_to_thing)
             add_files = list(set(add_files))
             set_to_thing = add_files
 
@@ -58,23 +70,29 @@ def set_in_qsuite(qsuiteparser,qsuitefile,mode,set_to_thing):
         print("File",set_to_thing,"does not exist")
         sys.exit(1)
 
-def rm_in_qsuite(qsuiteparser,qsuitefile,thing_to_rm):
+def rm_in_qsuite(qsuiteparser,qsuitefile,things_to_rm):
     add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
     exec_file = qsuiteparser.get('Files','execute_after_scp')
+    custom_file = qsuiteparser.get('Files','customwrap')
 
     changed = False
+    
+    for thing_to_rm in things_to_rm: 
+        if thing_to_rm in add_files:
+            ndx = add_files.index(thing_to_rm)
+            add_files.pop(add_files.index(thing_to_rm))
+            if len(add_files)==0:
+                add_files.append('')
+            qsuiteparser.set('Files','additional_files',add_files)
+            changed = True
 
-    if thing_to_rm in add_files:
-        ndx = add_files.index(thing_to_rm)
-        add_files.pop(add_files.index(thing_to_rm))
-        if len(add_files)==0:
-            add_files.append('')
-        qsuiteparser.set('Files','additional_files',add_files)
-        changed = True
+        if thing_to_rm == exec_file:
+            qsuiteparser.set('Files','execute_after_scp',None)
+            changed = True
 
-    if thing_to_rm == exec_file:
-        qsuiteparser.set('Files','execute_after_scp',None)
-        changed = True
+        if thing_to_rm == custom_file:
+            qsuiteparser.set('Files','customwrap',None)
+            changed = True
 
     if changed:
         write_qsuite(qsuiteparser,qsuitefile)
