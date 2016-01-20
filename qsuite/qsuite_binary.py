@@ -13,23 +13,32 @@ from qsuite import rm_in_qsuite
 from qsuite import write_qsuite
 from qsuite import rm 
 from qsuite import reset 
+from qsuite import ssh_command 
+from qsuite import ssh_connect
+import paramiko
+import select
 
 
-
-
-
-def update_git(cf):
+def update_git(cf,ssh):
     repos = cf.git_repos
 
-    repostring = 'ssh ' + cf.useratserver + ' "'
+    ssh.connect(cf.server)
+    repostring = ''
     for repo in cf.git_repos:
         repostring += "cd %s; git fetch; git pull; %s; " % tuple(repo)
 
-    repostring += '"'
 
-    if len(cf.git_repos)>0 :
-        print(" ===",repostring)
-        os.system(repostring)
+    ssh_command(ssh,repostring)
+
+
+
+
+
+    #stdin.flush()
+
+    #if len(cf.git_repos)>0 :
+    #    print(" ===",repostring)
+    #    os.system(repostring)
 
 
 def init(qsuitefile,opts):
@@ -159,9 +168,10 @@ def main():
         configfile = os.path.join(os.getcwd(),configfile)
 
     cf = qconfig(configfile)
+    ssh = ssh_connect(cf)
 
     if cmd in ["git","gitupdate","git_update","updategit","update_git"]:
-        update_git(cf)
+        update_git(cf,ssh)
     else:
         pass
 
