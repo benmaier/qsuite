@@ -11,6 +11,8 @@ from qsuite import get_qsuite
 from qsuite import set_in_qsuite
 from qsuite import rm_in_qsuite
 from qsuite import write_qsuite
+from qsuite import rm 
+from qsuite import reset 
 
 
 
@@ -35,6 +37,7 @@ def init(qsuitefile,opts):
     copy_template("config",opts)
     copy_template("simulation",opts)
     write_qsuite(qsuiteparser,qsuitefile)
+
 
 
 def main():
@@ -81,7 +84,7 @@ def main():
     qsuiteparser = get_qsuite(qsuitefile)
 
     if cmd in ["set"]:
-        if len(args)>1:
+        if len(args)>2:
 
             thing_to_set = args[1]
             set_to_thing = args[2]
@@ -114,6 +117,22 @@ def main():
 
         else:
             print("Nothing to set!")
+            sys.exit(1)
+
+    elif cmd in ["reset","resetdefault"]:
+        if len(args)>1:
+
+            things_to_reset = args[1:]
+            for thing_to_reset in things_to_reset:
+                if thing_to_reset in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:
+                    reset("config")
+                elif thing_to_reset in ["defaultsim", "defaultsimulation"]:
+                    reset("simulation")
+                elif thing_to_reset in ["defaultwrap", "defaultcustomwrap", "defaultcustomwrapper"]:
+                    reset("customwrap")
+            sys.exit(0)
+        else:
+            print("Nothing to reset given.")
             sys.exit(1)
 
     elif cmd in ["add"]:

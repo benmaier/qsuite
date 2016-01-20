@@ -10,6 +10,7 @@ setup(name='qsuite',
       packages=['qsuite'],
       install_requires=[
           'numpy',
+          'paramiko',
       ],
       dependency_links=[
           ],

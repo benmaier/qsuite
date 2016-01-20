@@ -19,6 +19,26 @@ def get_template_file(filename):
 
     return sourcefile
 
+def reset(mode):
+
+    if mode == "config":
+        filename = "qsuite_config.py"
+    elif mode == "simulation":
+        filename = "simulation.py"
+    elif mode == "customwrap":
+        filename = "custom_wrap_results.py"
+    else:
+        print("copy_template(): no such mode as", mode)
+        sys.exit(1)
+
+    targetfile = os.path.join(qsuite.customdir,filename)
+
+    if os.path.exists(targetfile):
+        yn = raw_input("This action deletes the current default "+mode+" file. Do you want to proceed (y/n)? ")
+        yn = yn.lower()[0]
+        delete_file = (yn == "y")
+        if delete_file:
+            qsuite.rm(targetfile)
 
 
 def copy_template(mode,options=[]):
@@ -41,6 +61,10 @@ def copy_template(mode,options=[]):
     #copy template to cwd
     if not os.path.exists(targetfile) or "-f" in options:
         shutil.copy2(sourcefile,targetfile)
+
+        if targetfile.endswith(".py"):
+            rm(targetfile+"c") #remove class files
+
         print("Initialized",mode,"as",filename)
     else:
         print("The file",filename,"already exists. Remove it first or use the '-f' flag to force copying the template.")

@@ -43,11 +43,11 @@ shell = "/bin/bash"
 pythonpath = "python"
 basename = "experimentname"
 name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
-pathatserver = "~/" + projectname + "/" + name + "/"
-resultpath = pathatserver + "/results"
+serverpath = "~/" + projectname + "/" + name + "/"
+resultpath = serverpath + "/results"
 
 #=======================================
-localdir = os.path.join(os.getcwd(),"results_"+name)
+localpath = os.path.join(os.getcwd(),"results_"+name)
 
 #========================
 git_repos = [
