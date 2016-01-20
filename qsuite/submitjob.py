@@ -35,7 +35,7 @@ def get_file_list(cf):
             ),
             (
                 os.path.join(qsuite.__path__[0],"queuesys","job.py"),
-                cf.serverpath + "/jop.py"
+                cf.serverpath + "/job.py"
             ),
             (
                 os.path.join(qsuite.__path__[0],"qconfig.py"),
