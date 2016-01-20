@@ -16,7 +16,6 @@ if len(args)>1:
 
 #get kwargs for the simulation of this jobnumber
 job_kwargs = cf.get_kwargs(cf.parameter_names,cf.parameter_list[j])
-print cf.parameter_list
 
 #prepare result lists
 results = [ None for i in xrange(len(cf.internal_parameter_list)) ]
