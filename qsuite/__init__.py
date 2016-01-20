@@ -10,3 +10,4 @@ from .qconfig import *
 from .template import *
 from .qsuiteparse import *
 from .ssh import *
+from .submitjob import *

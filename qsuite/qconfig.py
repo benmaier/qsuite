@@ -1,19 +1,41 @@
 import os 
 import sys
-import qsuite
 import numpy as np
 import itertools
+import ast
 
 class qconfig(object):
 
-    def __init__(self,filename="config_file.py"):
+    def __init__(self,filename="qsuite_config.py",qsuiteparser=None):
 
-        self.configpath = os.path.join(os.getcwd(), filename)
+        if qsuiteparser is None:
+            self.configpath = os.path.join(os.getcwd(), filename)
+        else:
+            self.configfile = qsuiteparser.get('Files','config')
+            if not os.path.exists(self.configfile):
+                self.configfile = os.path.join(os.getcwd(),self.configfile)
+
+            self.files_to_scp = { 
+                                    "qsuite_config.py": self.configfile,
+                                    "simulation.py": qsuiteparser.get('Files','simulation'),
+                                }
+
+            if not qsuiteparser.get('Files','execute_after_scp') == "None": 
+                self.files_to_scp["execute_after_scp.sh"] = qsuiteparser.get('Files','execute_after_scp')
+            if not qsuiteparser.get('Files','customwrap') == "None":
+                self.files_to_scp["custom_wrap_results.py"] = qsuiteparser.get('Files','customwrap')
+
+            add_files = ast.literal_eval(qsuiteparser.get('Files','additional_files'))
+            self.additional_files_to_scp = [ f for f in add_files if not f=='' ]
+
+            self.configpath = self.configfile
+
+
 
         if os.path.exists(self.configpath):
             cf = self.get_cf(self.configpath)
         else:
-            print"No config_file.py found in current working directory!"
+            print "No "+filename+" found in current working directory!"
             sys.exit(1)
 
 
@@ -25,7 +47,7 @@ class qconfig(object):
         self.internal_names, self.internal_parameter_list = self.get_param_lists(self.internal_parameters)
 
         #prepare standard parameters list and kwargs
-        self.standard_names, self.standard_list = self.get_param_lists(self.standard_parameters)
+        self.standard_names, self.standard_list = self.get_param_lists(self.standard_parameters,product=False)
         self.std_kwargs = self.get_kwargs(self.standard_names,self.standard_list)
 
         #get min and max jobnumber
@@ -93,11 +115,16 @@ class qconfig(object):
         return kwargs
     """
 
-    def get_param_lists(self,plist):
+    def get_param_lists(self,plist,product=True):
         pnames = [ p[0] for p in plist ]
         plist = [ p[1] for p in plist ]
 
-        return pnames, plist
+        if product:
+            parameter_list = list(itertools.product(*plist))
+        else:
+            parameter_list = plist
+
+        return pnames, parameter_list
 
     def get_kwargs(self,pnames,current_parameters):
         kwargs = { 
@@ -113,5 +140,5 @@ if __name__=="__main__":
 
     cf = qconfig()
 
-    print(cf.hallo)
+    print cf.get_param_lists(cf.parameter_names,cf.parameter_list[0])
     

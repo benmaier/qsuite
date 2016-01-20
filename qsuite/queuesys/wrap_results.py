@@ -1,12 +1,14 @@
-import config_file as cf
+from qconfig import qconfig
 import cPickle as pickle
 from numpy import *
 import os
 import sys
 
+cf = qconfig()
+
 #get dimensions of the list space
-pdims = [ len(p) for p in cf.plist ]
-idims = [ len(p) for p in cf.ilist ]
+pdims = [ len(p[1]) for p in cf.external_parameters ]
+idims = [ len(p[1]) for p in cf.internal_parameters ]
 
 #prepare result arrays
 results = empty(pdims+idims,dtype=object).flatten()

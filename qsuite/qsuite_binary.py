@@ -15,6 +15,8 @@ from qsuite import rm
 from qsuite import reset 
 from qsuite import ssh_command 
 from qsuite import ssh_connect
+from qsuite import make_job_ready
+from qsuite import start_job
 import paramiko
 import select
 
@@ -28,7 +30,8 @@ def update_git(cf,ssh):
         repostring += "cd %s; git fetch; git pull; %s; " % tuple(repo)
 
 
-    ssh_command(ssh,repostring)
+    if len(cf.git_repos)>0 :
+        ssh_command(ssh,repostring)
 
 
 
@@ -67,6 +70,14 @@ def main():
     cf = None
     qsuiteparser = None
 
+    git_cmds = ["git","gitupdate","git_update","updategit","update_git"]
+    prep_cmds = [ "prepare", "make", "makeready" ]
+    submit_cmds = [ "submit", "start", "submit_job"]
+    set_cmds = ["set"]
+    reset_cmds = ["reset", "resetdefault"]
+    add_cmds = ["add"]
+    rm_cmds = ["rm","remove"]
+
     if cmd in ["init","initialize"]:
         if len(args)==1:
             if not os.path.exists(qsuitefile):
@@ -89,90 +100,105 @@ def main():
         #if there's no ".qsuite" file yet, stop operating
         print("Not initialized yet!")
         sys.exit(1)
+    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds):
 
-    qsuiteparser = get_qsuite(qsuitefile)
+        qsuiteparser = get_qsuite(qsuitefile)
 
-    if cmd in ["set"]:
-        if len(args)>2:
+        if cmd in set_cmds:
+            if len(args)>2:
 
-            thing_to_set = args[1]
-            set_to_thing = args[2]
+                thing_to_set = args[1]
+                set_to_thing = args[2]
 
-            if thing_to_set in ["cfg", "config", "configuration"]:
-                set_in_qsuite(qsuiteparser,qsuitefile,"config",set_to_thing)
-            elif thing_to_set in ["sim", "simulation"]:
-                set_in_qsuite(qsuiteparser,qsuitefile,"simulation",set_to_thing)
-            elif thing_to_set in ["customwrap", "customwrapper"]:
-                set_in_qsuite(qsuiteparser,qsuitefile,"customwrap",set_to_thing)
-            elif thing_to_set in ["exec", "execute", "exe"]:
-                set_in_qsuite(qsuiteparser,qsuitefile,"exec",set_to_thing)
+                if thing_to_set in ["cfg", "config", "configuration"]:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"config",set_to_thing)
+                elif thing_to_set in ["sim", "simulation"]:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"simulation",set_to_thing)
+                elif thing_to_set in ["customwrap", "customwrapper"]:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"customwrap",set_to_thing)
+                elif thing_to_set in ["exec", "execute", "exe"]:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"exec",set_to_thing)
 
-            elif thing_to_set.startswith("default"):
-                if len(args)>2:
+                elif thing_to_set.startswith("default"):
+                    if len(args)>2:
 
-                    file_to_set = args[2]
+                        file_to_set = args[2]
 
-                    if thing_to_set in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:
-                        set_default_file("config",file_to_set)
-                    elif thing_to_set in ["defaultsim", "defaultsimulation"]:
-                        set_default_file("simulation",file_to_set)
-                    elif thing_to_set in ["defaultwrap", "defaultcustomwrap", "defaultcustomwrapper"]:
-                        set_default_file("customwrap",file_to_set)
+                        if thing_to_set in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:
+                            set_default_file("config",file_to_set)
+                        elif thing_to_set in ["defaultsim", "defaultsimulation"]:
+                            set_default_file("simulation",file_to_set)
+                        elif thing_to_set in ["defaultwrap", "defaultcustomwrap", "defaultcustomwrapper"]:
+                            set_default_file("customwrap",file_to_set)
+                        sys.exit(0)
+                    else:
+                        print("No default file given.")
+                        sys.exit(1)
                 else:
-                    print("No default file given.")
+                    print("Option "+ thing_to_set +" not known.")
                     sys.exit(1)
+                sys.exit(0)
             else:
-                print("Option "+ thing_to_set +" not known.")
+                print("Nothing to set!")
+                sys.exit(1)
 
-        else:
-            print("Nothing to set!")
-            sys.exit(1)
+        elif cmd in reset_cmds:
+            if len(args)>1:
 
-    elif cmd in ["reset","resetdefault"]:
-        if len(args)>1:
+                things_to_reset = args[1:]
+                for thing_to_reset in things_to_reset:
+                    if thing_to_reset in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:
+                        reset("config")
+                    elif thing_to_reset in ["defaultsim", "defaultsimulation"]:
+                        reset("simulation")
+                    elif thing_to_reset in ["defaultwrap", "defaultcustomwrap", "defaultcustomwrapper"]:
+                        reset("customwrap")
+                sys.exit(0)
+            else:
+                print("Nothing to reset given.")
+                sys.exit(1)
 
-            things_to_reset = args[1:]
-            for thing_to_reset in things_to_reset:
-                if thing_to_reset in ["defaultcfg", "defaultconfig", "defaultconfiguration"]:
-                    reset("config")
-                elif thing_to_reset in ["defaultsim", "defaultsimulation"]:
-                    reset("simulation")
-                elif thing_to_reset in ["defaultwrap", "defaultcustomwrap", "defaultcustomwrapper"]:
-                    reset("customwrap")
-            sys.exit(0)
-        else:
-            print("Nothing to reset given.")
-            sys.exit(1)
+        elif cmd in add_cmds:
 
-    elif cmd in ["add"]:
+            if len(args)>1:
+                thing_to_set = args[1:]
+                set_in_qsuite(qsuiteparser,qsuitefile,"add",thing_to_set)
+                sys.exit(0)
+            else:
+                print("Nothing to add!")
+                sys.exit(1)
 
-        if len(args)>1:
-            thing_to_set = args[1:]
-            set_in_qsuite(qsuiteparser,qsuitefile,"add",thing_to_set)
-            sys.exit(0)
-        else:
-            print("Nothing to add!")
-            sys.exit(1)
+        elif cmd in rm_cmds:
+            if len(args)>1:
+                thing_to_set = args[1:]
+                rm_in_qsuite(qsuiteparser,qsuitefile,thing_to_set)
+                sys.exit(0)
+            else:
+                print("Nothing to remove!")
+                sys.exit(1)
 
-    elif cmd in ["rm"]:
-        if len(args)>1:
-            thing_to_set = args[1:]
-            rm_in_qsuite(qsuiteparser,qsuitefile,thing_to_set)
-        else:
-            print("Nothing to remove!")
-            sys.exit(1)
+        elif cmd in git_cmds + prep_cmds + submit_cmds:
 
 
-    configfile = qsuiteparser.get('Files','config')
-    if not os.path.exists(configfile):
-        configfile = os.path.join(os.getcwd(),configfile)
+            cf = qconfig(qsuiteparser=qsuiteparser)
+            ssh = ssh_connect(cf)
 
-    cf = qconfig(configfile)
-    ssh = ssh_connect(cf)
-
-    if cmd in ["git","gitupdate","git_update","updategit","update_git"]:
-        update_git(cf,ssh)
+         
+            if cmd in git_cmds:
+                update_git(cf,ssh)
+                sys.exit(0)        
+            elif cmd in prep_cmds:
+                update_git(cf,ssh)
+                make_job_ready(cf,ssh)
+                sys.exit(0)
+            elif cmd in submit_cmds:
+                update_git(cf,ssh)
+                make_job_ready(cf,ssh)
+                start_job(cf,ssh)
+                sys.exit(0)
+            else:
+                pass
     else:
-        pass
+        print("Command",cmd,"unknown")
 
 

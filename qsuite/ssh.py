@@ -4,7 +4,7 @@ import os
 
 def ssh_command(ssh,command):
     """
-    this is adapted from Sebastian Dahlgren
+    this is adapted from code by Sebastian Dahlgren
     http://sebastiandahlgren.se/2012/10/11/using-paramiko-to-send-ssh-commands/
     """
 
@@ -28,7 +28,7 @@ def ssh_command(ssh,command):
 
 def ssh_connect(cf):
     """
-    this is adapted from Sebastian Dahlgren
+    this is adapted from code by Sebastian Dahlgren
     http://sebastiandahlgren.se/2012/10/11/using-paramiko-to-send-ssh-commands/
     """
     try:
@@ -44,3 +44,16 @@ def ssh_connect(cf):
         print("Couldn't establish an ssh connection to %s" % cf.server)
 
     return ssh
+
+def sftp_put_files(ssh,cf,files_destinations):
+
+    ssh_command(ssh,
+                "mkdir -p "+cf.serverpath+"; "+\
+                "mkdir -p "+cf.resultpath+"; "+\
+                "mkdir -p "+cf.serverpath+"/output")
+
+    ftp = ssh.open_sftp()
+
+    for f,d in files_destinations:
+        print(" "+f+"\n =>"+d)
+        ftp.put(f,d)

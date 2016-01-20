@@ -43,7 +43,7 @@ shell = "/bin/bash"
 pythonpath = "python"
 basename = "experimentname"
 name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
-serverpath = "~/" + projectname + "/" + name + "/"
+serverpath = "/home/"+username +"/"+ projectname + "/" + name 
 resultpath = serverpath + "/results"
 
 #=======================================
