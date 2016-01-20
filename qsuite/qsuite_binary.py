@@ -33,15 +33,17 @@ def update_git(cf,ssh):
     if len(cf.git_repos)>0 :
         ssh_command(ssh,repostring)
 
-
-
-
-
     #stdin.flush()
 
     #if len(cf.git_repos)>0 :
     #    print(" ===",repostring)
     #    os.system(repostring)
+
+def wrap_results(cf,ssh):
+    ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " wrap_results.py;")
+
+
+
 
 
 def init(qsuitefile,opts):
@@ -77,6 +79,7 @@ def main():
     reset_cmds = ["reset", "resetdefault"]
     add_cmds = ["add"]
     rm_cmds = ["rm","remove"]
+    wrap_cmds = ["wrap","wrapresults","wrap_results"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
@@ -100,7 +103,7 @@ def main():
         #if there's no ".qsuite" file yet, stop operating
         print("Not initialized yet!")
         sys.exit(1)
-    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds):
+    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds + wrap_cmds):
 
         qsuiteparser = get_qsuite(qsuitefile)
 
@@ -177,7 +180,7 @@ def main():
                 print("Nothing to remove!")
                 sys.exit(1)
 
-        elif cmd in git_cmds + prep_cmds + submit_cmds:
+        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds:
 
 
             cf = qconfig(qsuiteparser=qsuiteparser)
@@ -196,9 +199,12 @@ def main():
                 make_job_ready(cf,ssh)
                 start_job(cf,ssh)
                 sys.exit(0)
+            elif cmd in wrap_cmds:
+                wrap_results(cf,ssh)
+                sys.exit(0)
             else:
                 pass
     else:
-        print("Command",cmd,"unknown")
+        print("Command",cmd,"unknown.")
 
 
