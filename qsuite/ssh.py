@@ -15,6 +15,7 @@ def ssh_command(ssh,command):
 
     # Wait for the command to terminate
     last_line = ''
+    complete_received = ''
     while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel
         while stdout.channel.recv_ready():
@@ -30,7 +31,7 @@ def ssh_command(ssh,command):
                 else:
                     last_line = ''
                     received = recv
-                #print("printing now")
+                complete_received += received
                 sys.stdout.write(received)
 
     while stdout.channel.recv_ready():
@@ -46,16 +47,19 @@ def ssh_command(ssh,command):
             else:
                 last_line = ''
                 received = recv
-            #print("printing now")
+            complete_received += received
             sys.stdout.write(received)
 
                 
     if (last_line is not None) and (last_line != "") and (not last_line.endswith("\n")):
         sys.stdout.write(last_line+"\n")
+        complete_received += last_line+"\n"
 
     err = '\n'.join(stderr.read().split('\n')[:-1])
     if err != '':
         print(err)
+
+    return complete_received
 
 
 def ssh_connect(cf):
@@ -89,3 +93,11 @@ def sftp_put_files(ssh,cf,files_destinations):
     for f,d in files_destinations:
         print(" "+f+"\n =>"+d)
         ftp.put(f,d)
+
+def sftp_get_files(ssh,cf,files_destinations):
+
+    ftp = ssh.open_sftp()
+
+    for f,d in files_destinations:
+        print(" "+f+"\n =>"+d)
+        ftp.get(f,d)

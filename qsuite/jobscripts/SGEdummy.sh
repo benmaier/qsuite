@@ -1,4 +1,4 @@
-#!/bin/bash
+#!%s
 #$ -V
 #$ -cwd
 #$ -l mem=%s

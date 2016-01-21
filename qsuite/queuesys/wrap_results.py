@@ -25,13 +25,14 @@ try:
             res = pickle.load(open(cf.resultpath+"/results_%d.p" % j,'r'))
             #print res
             
-        for i in range(len(res)):
+        for i in range(len(time)):
             icoords = [ [c] for c in list(unravel_index(i, idims)) ]
             flat_index = ravel_multi_index(pcoords+icoords,pdims+idims)
             times[flat_index] = time[i]
             if not cf.only_save_times:
                 results[flat_index] = res[i]
-except:
+except Exception as e:
+    print "*** Caught exception: %s,%s" (e.__class__,e)
     print "couldn't load all files"
     sys.exit(1)
 

@@ -22,6 +22,7 @@ class qconfig(object):
 
             if not qsuiteparser.get('Files','execute_after_scp') == "None": 
                 self.files_to_scp["execute_after_scp.sh"] = qsuiteparser.get('Files','execute_after_scp')
+
             if not qsuiteparser.get('Files','customwrap') == "None":
                 self.files_to_scp["custom_wrap_results.py"] = qsuiteparser.get('Files','customwrap')
 

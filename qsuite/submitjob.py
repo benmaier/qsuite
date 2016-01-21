@@ -16,6 +16,7 @@ def get_jobscript(cf):
     JOBSCRIPT = get_dummy(cf.queue)
 
     jobscript = JOBSCRIPT % (\
+                cf.shell,
                 cf.memory,
                 cf.jmin+1,
                 cf.jmax+1,
@@ -74,12 +75,23 @@ def make_job_ready(cf,ssh):
     files_chmod_x = [ "chmod +x "+f[1]+"; " for f in files_destinations if f[1].endswith(".sh") ]
 
     ssh_command(ssh,''.join(files_chmod_x))
-    ssh_command(ssh,"cd " +cf.serverpath+"; ./execute_after_scp.sh;")
+
+    if "execute_after_scp.sh" in cf.files_to_scp:
+        ssh_command(ssh,"cd " +cf.serverpath+"; ./execute_after_scp.sh;")
+
 
 def start_job(cf,ssh):
     """taken from https://github.com/osg-bosco/BLAH/blob/1d217fad9c6b54a5e543f7a9d050e77047be0bb1/src/scripts/pbs_submit.sh#L193"""
-    ssh_command(ssh,"cd " +cf.serverpath+";\
-                     jobID=`qsub " + cf.basename + ".sh`;\
-                     jobID=`echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`;\
-                     echo $jobID > .jobid;")
+    if cf.queue=="SGE":
+        ssh_command(ssh,"cd " +cf.serverpath+";\
+                         jobID=`qsub " + cf.basename + ".sh`;\
+                         jobID=`echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`;\
+                         echo $jobID > .jobid;")
+    elif cf.queue=="PBS":
+        ssh_command(ssh,"cd " +cf.serverpath+";\
+                         jobID=`qsub " + cf.basename + ".sh`;\
+                         echo $jobID > .jobid;")
+    else:
+        print("Unknown queue:",cf.queue)
+        sys.exit(1)
     

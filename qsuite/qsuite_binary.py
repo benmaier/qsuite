@@ -17,8 +17,11 @@ from qsuite import ssh_command
 from qsuite import ssh_connect
 from qsuite import make_job_ready
 from qsuite import start_job
-import paramiko
-import select
+from qsuite import sftp_put_files
+from qsuite import sftp_get_files
+from qsuite import mkdirp
+import shutil
+import re
 
 
 def update_git(cf,ssh):
@@ -35,7 +38,18 @@ def update_git(cf,ssh):
 
 def wrap_results(cf,ssh):
     ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " wrap_results.py;")
+    custom_wrap_results(cf,ssh)
 
+def custom_wrap_results(cf,ssh):
+    if "custom_wrap_results.py" in cf.files_to_scp:
+        ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " custom_wrap_results.py;")
+
+def wrap_local(cf):
+
+    files = cf.files_to_scp.values() + cf.additional_files_to_scp
+    mkdirp(cf.localpath)
+    for f in files:
+        shutil.copy2(f,cf.localpath)
 
 def qstat(cf,ssh,args):
     if len(args)==0:
@@ -99,6 +113,9 @@ def main():
     wrap_cmds = ["wrap","wrapresults","wrap_results"]
     status_cmds = ["stat","qstat","status"]
     ssh_cmds = ["ssh"]
+    sftp_cmds = ["sftp","scp","ftp"]
+    customwrap_cmds = ["customwrap"]
+    get_cmds = ["get"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
@@ -122,7 +139,7 @@ def main():
         #if there's no ".qsuite" file yet, stop operating
         print("Not initialized yet!")
         sys.exit(1)
-    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds + wrap_cmds + status_cmds + ssh_cmds):
+    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds):
 
         qsuiteparser = get_qsuite(qsuitefile)
 
@@ -160,6 +177,10 @@ def main():
                     print("Option "+ thing_to_set +" not known.")
                     sys.exit(1)
                 sys.exit(0)
+            elif len(args)==2:
+                thing_to_set = args[1]
+                if thing_to_set in ["custom_wrap_results.py"]:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"customwrap",thing_to_set)
             else:
                 print("Nothing to set!")
                 sys.exit(1)
@@ -199,7 +220,7 @@ def main():
                 print("Nothing to remove!")
                 sys.exit(1)
 
-        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds + ssh_cmds:
+        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds:
 
 
             cf = qconfig(qsuiteparser=qsuiteparser)
@@ -212,21 +233,46 @@ def main():
             elif cmd in prep_cmds:
                 update_git(cf,ssh)
                 make_job_ready(cf,ssh)
+                wrap_local(cf)
                 sys.exit(0)
             elif cmd in submit_cmds:
                 update_git(cf,ssh)
                 make_job_ready(cf,ssh)
+                wrap_local(cf)
                 start_job(cf,ssh)
                 sys.exit(0)
             elif cmd in wrap_cmds:
                 wrap_results(cf,ssh)
                 sys.exit(0)
+            elif cmd in customwrap_cmds:
+                custom_wrap_results(cf,ssh)
+                sys.exit(0)
             elif cmd in status_cmds:
-                qstat(cf,ssh,sys.argv[2:])                 
+                cmds = args[1:]
+                qstat(cf,ssh,cmds)
                 sys.exit(0)
             elif cmd in ssh_cmds:
-                ssh_command(ssh," ".join(sys.argv[2:]))
+                cmds = args[1:]
+                ssh_command(ssh," ".join(cmds))
                 sys.exit(0)
+            elif cmd in sftp_cmds:
+                files = args[1:]
+                files_dests = [ (f,cf.serverpath+"/"+f) for f in files ]
+                sftp_put_files(ssh,cf,files_dests)
+            elif cmd in get_cmds:
+                #get the wrapped result
+                get_all =  len(args)>1 and args[1]=="all"
+
+                pattern_res = re.compile(r'result.*\.p$')
+                pattern_tim = re.compile(r'time.*\.p$')
+                resultstring = ssh_command(ssh,"ls "+cf.resultpath)
+                resultstring = resultstring.replace("\n"," ")
+                resultlist = [ f for f in resultstring.split(" ") if (f!="" and not f.startswith(".")) ]
+                resultlist = [ r for r in resultlist if not ((not get_all) and ((pattern_res.match(r)) or (pattern_tim.match(r)))) ]
+
+                files_dests = [ (cf.resultpath+"/"+f, os.path.join(cwd,cf.localpath,f)) for f in resultlist ]
+                sftp_get_files(ssh,cf,files_dests)
+
             else:
                 pass
     else:

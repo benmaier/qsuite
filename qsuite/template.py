@@ -3,6 +3,7 @@ import shutil
 import os
 import sys
 import qsuite
+from qsuite import rm
 
 def mkdirp_customdir():
     if not os.path.exists(qsuite.customdir):
