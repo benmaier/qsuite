@@ -1,7 +1,0 @@
-[Files]
-config = qsuite_config.py
-simulation = simulation.py
-customwrap = custom_wrap_results.py
-additional_files = ['custom_wrap_results.py']
-execute_after_scp = None
-
