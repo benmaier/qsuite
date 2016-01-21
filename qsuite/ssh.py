@@ -14,21 +14,47 @@ def ssh_command(ssh,command):
     stdin,stdout,stderr = ssh.exec_command(command)
 
     # Wait for the command to terminate
-    received = None
+    last_line = ''
     while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel
-	if stdout.channel.recv_ready():
+        while stdout.channel.recv_ready():
 	    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
 	    if len(rl) > 0:
 		# Print data from stdout
-                received = stdout.channel.recv(1024)
-		sys.stdout.write(received)
+                recv = stdout.channel.recv(1024)
+                lines = recv.split('\n')
+                if len(lines)>1:
+                    first_lines = '\n'.join(lines[:-1]) + '\n'
+                    received = last_line + first_lines
+                    last_line = lines[-1]
+                else:
+                    last_line = ''
+                    received = recv
+                #print("printing now")
+                sys.stdout.write(received)
+
+    while stdout.channel.recv_ready():
+        rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+        if len(rl) > 0:
+            # Print data from stdout
+            recv = stdout.channel.recv(1024)
+            lines = recv.split('\n')
+            if len(lines)>1:
+                first_lines = '\n'.join(lines[:-1]) + '\n'
+                received = last_line + first_lines
+                last_line = lines[-1]
+            else:
+                last_line = ''
+                received = recv
+            #print("printing now")
+            sys.stdout.write(received)
+
                 
-    if (received is not None) and (not received.endswith("\n")):
-        sys.stdout.write("\n")
+    if (last_line is not None) and (last_line != "") and (not last_line.endswith("\n")):
+        sys.stdout.write(last_line+"\n")
 
     err = '\n'.join(stderr.read().split('\n')[:-1])
-    if err != "":
+    if err != '':
         print(err)
 
 
