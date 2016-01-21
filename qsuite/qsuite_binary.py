@@ -29,21 +29,38 @@ def update_git(cf,ssh):
     for repo in cf.git_repos:
         repostring += "cd %s; git fetch; git pull; %s; " % tuple(repo)
 
-
     if len(cf.git_repos)>0 :
         ssh_command(ssh,repostring)
 
-    #stdin.flush()
-
-    #if len(cf.git_repos)>0 :
-    #    print(" ===",repostring)
-    #    os.system(repostring)
 
 def wrap_results(cf,ssh):
     ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " wrap_results.py;")
 
 
+def qstat(cf,ssh,args):
+    if len(args)==0:
+        flag = "-u " + cf.username
+        ssh_command(ssh,"qstat "+flag)
 
+    elif args[0] == "job":
+        if cf.queue=="SGE":
+            flag = "-j"
+        elif cf.queue=="PBS":
+            flag = ""
+        else:
+            print("Queue",cf.queue,"not supported.")
+            sys.exit(1)
+        ssh_command(ssh,"qstat "+flag+" $(cat "+cf.serverpath+"/.jobid)")
+
+    elif args[0] == "all":
+        if cf.queue=="SGE":
+            flag = '-u "*"'
+        elif cf.queue=="PBS":
+            flag = "-Q"
+        else:
+            print("Queue",cf.queue,"not supported.")
+            sys.exit(1)
+        ssh_command(ssh,"qstat "+flag)
 
 
 def init(qsuitefile,opts):
@@ -80,6 +97,8 @@ def main():
     add_cmds = ["add"]
     rm_cmds = ["rm","remove"]
     wrap_cmds = ["wrap","wrapresults","wrap_results"]
+    status_cmds = ["stat","qstat","status"]
+    ssh_cmds = ["ssh"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
@@ -103,7 +122,7 @@ def main():
         #if there's no ".qsuite" file yet, stop operating
         print("Not initialized yet!")
         sys.exit(1)
-    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds + wrap_cmds):
+    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds + wrap_cmds + status_cmds + ssh_cmds):
 
         qsuiteparser = get_qsuite(qsuitefile)
 
@@ -180,7 +199,7 @@ def main():
                 print("Nothing to remove!")
                 sys.exit(1)
 
-        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds:
+        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds + ssh_cmds:
 
 
             cf = qconfig(qsuiteparser=qsuiteparser)
@@ -201,6 +220,12 @@ def main():
                 sys.exit(0)
             elif cmd in wrap_cmds:
                 wrap_results(cf,ssh)
+                sys.exit(0)
+            elif cmd in status_cmds:
+                qstat(cf,ssh,sys.argv[2:])                 
+                sys.exit(0)
+            elif cmd in ssh_cmds:
+                ssh_command(ssh," ".join(sys.argv[2:]))
                 sys.exit(0)
             else:
                 pass

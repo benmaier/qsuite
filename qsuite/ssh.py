@@ -1,6 +1,7 @@
 import paramiko
 import select
 import os
+import sys
 
 def ssh_command(ssh,command):
     """
@@ -9,22 +10,27 @@ def ssh_command(ssh,command):
     """
 
     # Send the command (non-blocking)
-    print(command)
+    print("ssh> " + command)
     stdin,stdout,stderr = ssh.exec_command(command)
 
     # Wait for the command to terminate
+    received = None
     while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel
 	if stdout.channel.recv_ready():
 	    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
 	    if len(rl) > 0:
 		# Print data from stdout
-		print(stdout.channel.recv(1024))
-	if stderr.channel.recv_ready():
-	    rl, wl, xl = select.select([stderr.channel], [], [], 0.0)
-	    if len(rl) > 0:
-		# Print data from stdout
-		print(stdout.channel.recv(1024))
+                received = stdout.channel.recv(1024)
+		sys.stdout.write(received)
+                
+    if (received is not None) and (not received.endswith("\n")):
+        sys.stdout.write("\n")
+
+    err = '\n'.join(stderr.read().split('\n')[:-1])
+    if err != "":
+        print(err)
+
 
 def ssh_connect(cf):
     """

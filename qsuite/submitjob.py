@@ -77,5 +77,9 @@ def make_job_ready(cf,ssh):
     ssh_command(ssh,"cd " +cf.serverpath+"; ./execute_after_scp.sh;")
 
 def start_job(cf,ssh):
-    ssh_command(ssh,"cd " +cf.serverpath+"; qsub " + cf.basename + ".sh;")
+    """taken from https://github.com/osg-bosco/BLAH/blob/1d217fad9c6b54a5e543f7a9d050e77047be0bb1/src/scripts/pbs_submit.sh#L193"""
+    ssh_command(ssh,"cd " +cf.serverpath+";\
+                     jobID=`qsub " + cf.basename + ".sh`;\
+                     jobID=`echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`;\
+                     echo $jobID > .jobid;")
     
