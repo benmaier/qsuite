@@ -129,17 +129,17 @@ Three files appeared in your directory.
                            ( 'Ls', Ls   ),
                            ( 'rs', rs   ),
                            ( None   , measurements ),
-                         ]
+                          ]
    internal_parameters = [
                            ('N', Ns),
                            ('V', Vs[1:]),
                            ('T', Ts),
-                         ]
+                          ]
    standard_parameters = [
                            ( 'dt', dts[0] ),
                            ( 'x0', x0s[1] ),
                            ( 'maxt', runtimes[-1] ),
-                         ]
+                          ]
     #if this is true, only the simulation time will be saved and wrapped
    only_save_times = False
 
@@ -168,6 +168,6 @@ Three files appeared in your directory.
    #we add the git repo to get updated and installed.
    git_repos = [
                    ( "/home/"+username+"/brownian-motion", "python setup.py install --user" )
-               ]
+                ]
    ```
 
