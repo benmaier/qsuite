@@ -28,7 +28,7 @@ to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
 ### Without Root Access
 
 ```
-$ sudo python setup.py install --user
+$ python setup.py install --user
 ```
 
 Afterwards, add
