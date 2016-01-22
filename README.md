@@ -74,15 +74,13 @@ You now have three new files in your directory.
    This file holds the function `simulation_code` that will get called to start a single simulation with a fixed combination of parameters and a seed. All of those are passed in a dictionary called ``kwargs``. Ideally, the keys of ``kwargs`` are names of the parameters needed to initialize the simulation. In our case, ``simulation_code`` would load the module ``brownian_motion``, feed the parameters to it, run the simulation and retrieve the result. The parameters are passed in a ``kwargs`` dictionary and subsequently can be used to do whatever we want to do with it. In the end, our simulation has a result, e.g. the trajectories *x*(t) of the particles. This result can be wrapped in whatever container we prefer and returned. QSuite will store it in a ``pickle`` and wrap it up once all jobs on the cluster are computed.
    
    Our file will look like this
-   ```
+   ```python
    from brownian_motion import BrownianMotion()
 
    def simulation_code(kwargs):
 
        bm = BrownianMotion(**kwargs)
-
        bm.simulate()
-
        result = bm.get_trajectories()
 
        return result
