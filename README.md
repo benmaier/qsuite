@@ -101,9 +101,66 @@ Three files appeared in your directory.
        return result
    ```
 
-`qsuite_config.py`
+* `qsuite_config.py`
 
-   Whithin fhis file we will edit the configuration of our experiment and add information about our queueing system. I will address the structure of this file below. First, we have to decide which parameters should be used as *external* parameters. Those are parameters 
+   Whithin fhis file we will edit the configuration of our experiment and add information about our queueing system. First, we have to decide which parameters should be used as *external* parameters. Those are parameters which are scanned using the cluster meaning that for every combination of those parameters one job is created on the cluster. Second, we decide for *internal* parameters, which means that inside of each job, every combination of those parameters will be simulated. Finally, we may decide that we don't need to scan all parameters, but just set *Δt*=0.01, so this will be a standard parameter (i.e. constant).
+   
+   Our file will look like this
+   ```python
+   import os 
 
+   #=========== SIMULATION DETAILS ========
+   projectname = "project"
+   seed = -1
+   N_measurements = 1
 
+   measurements = range(N_measurements)
+   params1 = range(3)
+   params2 = range(3)
+   params3 = range(3)
+   params4 = range(3)
+   params5 = range(3)
+   params6 = range(3)
+
+   external_parameters = [
+                           ( 'p1', params1[:2]   ),
+                           ( 'p2', params2       ),
+                           ( None   , measurements ),
+                         ]
+   internal_parameters = [
+                           ('p3', params3[:1]),
+                           ('p3', params4[:]),
+                         ]
+   standard_parameters = [
+                           ( 'p5', params5[1] ),
+                           ( 'p6', params6[2] ),
+                         ]
+
+   only_save_times = False
+
+   #============== QUEUE ==================
+   queue = "SGE"
+   memory = "1G"
+   priority = 0
+
+   #============ CLUSTER SETTINGS ============
+   username = "user"
+   server = "localhost"
+   useratserver = username + u'@' + server
+
+   shell = "/bin/bash"
+   pythonpath = "python"
+   basename = "experimentname"
+   name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
+   serverpath = "/home/"+username +"/"+ projectname + "/" + name 
+   resultpath = serverpath + "/results"
+
+   #=======================================
+   localpath = os.path.join(os.getcwd(),"results_"+name)
+
+   #========================
+   git_repos = [
+                   ( "/home/"+username+"/brownian-motion", "python setup.py install --user" )
+               ]
+   ```
 
