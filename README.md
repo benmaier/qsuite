@@ -25,7 +25,7 @@ export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:
 
 to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
 
-### Without root access
+### Without Root Access
 
 ```
 $ sudo python setup.py install --user
@@ -43,7 +43,18 @@ to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
 
 Oftentimes different array jobs on clusters have the same framework. You have to do a simulation of a certain kind which depends on a lot of parameters. Some of those parameters change the computation time, while others do not affect the computation's duration at all. Sometimes you have to run a simulation multiple times with the same parameters but different seeds in order to get satisfying statistics. However, you don't want to write a new bashscript everytime you change your mind about the combination of parameters for your batch script. QSuite is a simple command line tool to generalize this work process while minimizing the researcher's work load. 
 
-## Files
+## How To
+
+Say you want to simulate a Brownian motion of *N* particles in a one-dimensional box, interacting with a Gaussian potential. There are 3 parameters to consider:
+
+    * the number of particles *N*
+    * the temperature *T* of the system
+    * the interaction strength *V*
+    * the interaction radius *r*
+    * the runtime *t*
+    * the time spacing *Δt*
+
+
 
 ### ``simulation.py``
 
