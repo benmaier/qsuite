@@ -174,3 +174,17 @@ Three files appeared in your directory.
                 ]
    ```
 
+* ``.qsuite``
+   
+   This is a local QSuite configuration file which keeps track of the files relevant to your project. Don't mess around with it! Or do, what do I care.
+
+### Submitting the Job
+
+```bash
+$ qsuite submit
+```
+
+Easy, no?
+
+
+
