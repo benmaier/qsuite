@@ -47,12 +47,14 @@ Oftentimes different array jobs on clusters have the same framework. You have to
 
 Say you want to simulate a Brownian motion of *N* particles in a one-dimensional box, interacting with a Gaussian potential. There are 3 parameters to consider:
 
-    * the number of particles *N*
-    * the temperature *T* of the system
-    * the interaction strength *V*
-    * the interaction radius *r*
-    * the runtime *t*
-    * the time spacing *Δt*
+* the number of particles *N*
+* the length of the box *L*
+* the temperature *T* of the system
+* the interaction strength *V*
+* the interaction radius *r*
+* the maximal runtime *t*
+* the time spacing *Δt*
+
 
 
 
