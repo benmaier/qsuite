@@ -20,7 +20,7 @@ $ sudo python setup.py install
 If you're not running a virtualenv python, make sure you add
 
 ```
-export=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
 ```
 
 to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
@@ -34,7 +34,7 @@ $ sudo python setup.py install --user
 Afterwards, add
 
 ```
-export=~/.local/bin:$PATH
+export PATH=~/.local/bin:$PATH
 ```
 
 to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
