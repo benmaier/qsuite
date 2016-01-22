@@ -1,6 +1,43 @@
-# ROCS Queueing Suite 
+# QSuite 
 
 Provides a general framework to submit array jobs on an SGE (Sun Grid Engine) or a PBS (Portable Batch System) queueing system with multiple parameters and multiple measurements. Includes easy collection, possible costumized preprocessing and download of the jobs' results.
+
+## Install
+
+### Linux
+
+```
+$ sudo python setup.py install
+```
+
+### Mac OSX
+First, do 
+
+```
+$ sudo python setup.py install
+```
+
+If you're not running a virtualenv python, make sure you add
+
+```
+export=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+```
+
+to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
+
+### Without root access
+
+```
+$ sudo python setup.py install --user
+```
+
+Afterwards, add
+
+```
+export=~/.local/bin:$PATH
+```
+
+to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
 
 ## Philosophy
 
