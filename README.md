@@ -112,30 +112,35 @@ Three files appeared in your directory.
    #=========== SIMULATION DETAILS ========
    projectname = "project"
    seed = -1
-   N_measurements = 1
+   N_measurements = 10 #we want 10 measurements for each parameter combination
 
    measurements = range(N_measurements)
-   params1 = range(3)
-   params2 = range(3)
-   params3 = range(3)
-   params4 = range(3)
-   params5 = range(3)
-   params6 = range(3)
+   Ns = [ 1,10,100 ]
+   Ls = [ 0.5, 1.0, 2.0 ]
+   Ts = [ 0.5, 1.0, 2.0 ]
+   Vs = [ 0.5, 1.0, 2.0 ]
+   rs = [ 0.1, 0.2, 0.3 ]
+   runtimes = [ 10.0, 100.0, 1000.0 ]
+   x0s = [ 0., 0.5, 1.0 ] #in units of L
+   dts = [ 0.001, 0.01]
 
+   #this will have BrownianMotions()'s function parameter names
    external_parameters = [
-                           ( 'p1', params1[:2]   ),
-                           ( 'p2', params2       ),
+                           ( 'Ls', Ls   ),
+                           ( 'rs', rs   ),
                            ( None   , measurements ),
                          ]
    internal_parameters = [
-                           ('p3', params3[:1]),
-                           ('p3', params4[:]),
+                           ('N', Ns),
+                           ('V', Vs[1:]),
+                           ('T', Ts),
                          ]
    standard_parameters = [
-                           ( 'p5', params5[1] ),
-                           ( 'p6', params6[2] ),
+                           ( 'dt', dts[0] ),
+                           ( 'x0', x0s[1] ),
+                           ( 'maxt', runtimes[-1] ),
                          ]
-
+    #if this is true, only the simulation time will be saved and wrapped
    only_save_times = False
 
    #============== QUEUE ==================
@@ -145,7 +150,7 @@ Three files appeared in your directory.
 
    #============ CLUSTER SETTINGS ============
    username = "user"
-   server = "localhost"
+   server = "server"
    useratserver = username + u'@' + server
 
    shell = "/bin/bash"
@@ -159,6 +164,8 @@ Three files appeared in your directory.
    localpath = os.path.join(os.getcwd(),"results_"+name)
 
    #========================
+   #since we need the updated source code of the brownian_motion module on the server,
+   #we add the git repo to get updated and installed.
    git_repos = [
                    ( "/home/"+username+"/brownian-motion", "python setup.py install --user" )
                ]
