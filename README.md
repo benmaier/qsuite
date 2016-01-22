@@ -66,6 +66,12 @@ Let's assume we don't know that some of the parameters can be rescaled and want 
 class BrownianMotion:
     def __init__(N, L, T, V, r, tmax, dt, x0, seed=-1):
         ...
+
+    def simulate():
+        ...
+
+    def get_trajectories():
+        ...
 ```
 
 
@@ -76,7 +82,7 @@ $ mkdir brownian; cd brownian
 $ qsuite init
 ```
 
-You now have three new files in your directory.
+Three files appeared in your directory.
 
 * `simulation.py`
    
