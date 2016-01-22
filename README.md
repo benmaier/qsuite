@@ -110,7 +110,7 @@ Three files appeared in your directory.
    import os 
 
    #=========== SIMULATION DETAILS ========
-   projectname = "project"
+   projectname = "brownian_motion"
    seed = -1
    N_measurements = 10 #we want 10 measurements for each parameter combination
 
@@ -154,8 +154,8 @@ Three files appeared in your directory.
    useratserver = username + u'@' + server
 
    shell = "/bin/bash"
-   pythonpath = "python"
-   basename = "experimentname"
+   pythonpath = "/usr/bin/python"
+   basename = "bm_const_dt"
    name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
    serverpath = "/home/"+username +"/"+ projectname + "/" + name 
    resultpath = serverpath + "/results"
