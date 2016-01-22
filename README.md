@@ -139,8 +139,8 @@ Three files appeared in your directory.
                            ('T', Ts),
                           ]
    standard_parameters = [
-                           ( 'dt', dts[0] ),
-                           ( 'x0', x0s[1] ),
+                           ( 'dt', dts[1] ),
+                           ( 'x0', x0s[0] ),
                            ( 'maxt', runtimes[-1] ),
                           ]
     #if this is true, only the simulation time will be saved and wrapped
