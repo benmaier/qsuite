@@ -49,6 +49,8 @@ Oftentimes different array jobs on clusters have the same framework. You have to
 
 ## How To
 
+### Prelude
+
 Say we want to simulate a Brownian motion of *N* particles in a one-dimensional box, interacting with a certain potential characterized by an interaction strength *V* and an interaction radius *r*. There are a bunch of parameters to consider:
 
 * the number of particles *N*
@@ -74,6 +76,7 @@ class BrownianMotion:
         ...
 ```
 
+### Initializing QSuite
 
 So, now it's time to start the project. Do the following.
 
