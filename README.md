@@ -45,7 +45,7 @@ Oftentimes different array jobs on clusters have the same framework. You have to
 
 ## How To
 
-Say you want to simulate a Brownian motion of *N* particles in a one-dimensional box, interacting with a Gaussian potential. There are 3 parameters to consider:
+Say we want to simulate a Brownian motion of *N* particles in a one-dimensional box, interacting with a certain potential characterized by an interaction strength *V* and an interaction radius *r*. There are a bunch of parameters to consider:
 
 * the number of particles *N*
 * the length of the box *L*
@@ -54,8 +54,19 @@ Say you want to simulate a Brownian motion of *N* particles in a one-dimensional
 * the interaction radius *r*
 * the maximal runtime *t*
 * the time spacing *Δt*
+* the initial conditons *x*(0)
 
+Let's assume we don't know that some of the parameters can be rescaled and want to scan the whole parameter space. Luckily, a lot of the work for the project has already been done (yay!); at some point we wrote a python module ``brownian_motion`` which takes care of the simulation once it got the parameters passed. So, now it's time to start the project. Do the following.
 
+```
+$ mkdir brownian; cd brownian
+$ qsuite init
+```
+
+You know have three new files in your directory.
+
+* `qsuite_config.py`
+ * asfsf 
 
 
 ### ``simulation.py``
