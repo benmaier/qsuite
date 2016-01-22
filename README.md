@@ -60,7 +60,16 @@ Say we want to simulate a Brownian motion of *N* particles in a one-dimensional 
 * the time spacing *Δt*
 * the initial conditons *x*(0)
 
-Let's assume we don't know that some of the parameters can be rescaled and want to scan the whole parameter space. Luckily, a lot of the work for the project has already been done (yay!); at some point we wrote a python module ``brownian_motion`` which takes care of the simulation once it got the parameters passed. So, now it's time to start the project. Do the following.
+Let's assume we don't know that some of the parameters can be rescaled and want to scan the whole parameter space. Luckily, a lot of the work for the project has already been done (yay!); at some point we wrote a python module ``brownian_motion`` which takes care of the simulation once it got the parameters passed. Consider it to look something like this
+
+```python
+class BrownianMotion:
+    def __init__(N, L, T, V, r, tmax, dt, x0, seed=-1):
+        ...
+```
+
+
+So, now it's time to start the project. Do the following.
 
 ```
 $ mkdir brownian; cd brownian
@@ -88,11 +97,7 @@ You now have three new files in your directory.
 
 `qsuite_config.py`
 
-   Whithin fhis file we will edit the configuration of our experiment and add information about our queueing system. I will address the structure of this file below.
+   Whithin fhis file we will edit the configuration of our experiment and add information about our queueing system. I will address the structure of this file below. First, we have to decide which parameters should be used as *external* parameters. Those are parameters 
 
 
 
-### ``simulation.py``
-
-
-### ``config_dummy.py``
