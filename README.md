@@ -25,7 +25,7 @@ export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:
 
 to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
 
-### Without Root Access
+### Without root access
 
 ```
 $ python setup.py install --user
@@ -47,7 +47,7 @@ The code is written for cross platform usage, so theoretically it should work on
 
 Oftentimes different array jobs on clusters have the same framework. You have to do a simulation of a certain kind which depends on a lot of parameters. Some of those parameters change the computation time, while others do not affect the computation's duration at all. Sometimes you have to run a simulation multiple times with the same parameters but different seeds in order to get satisfying statistics. However, you don't want to write a new bashscript everytime you change your mind about the combination of parameters for your batch script. QSuite is a simple command line tool to generalize this work process while minimizing the researcher's work load. 
 
-## How To
+## How to
 
 ### Prelude
 
@@ -178,7 +178,7 @@ Three files appeared in your directory.
    
    This is a local QSuite configuration file which keeps track of the files relevant to your project. Don't mess around with it! Or do, what do I care.
 
-### Submitting the Job
+### Submitting the job
 
 ```bash
 $ qsuite submit
@@ -186,7 +186,7 @@ $ qsuite submit
 
 Alternatively `$ qsuite start`. This will create a local directory `results_${name}` where all your relevant files will be copied to. It then copies all relevant files to the queueing system and submits the job.  
 
-## Basic Functions
+## Basic functions
 
 ### Wrap the results
 Once the job is finished, do
@@ -197,7 +197,7 @@ $ qsuite wrap
 
 The results are now stored in `${serverpath}/results/results.p and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`.
 
-### Customized Wrapping
+### Customized wrapping
 
 Often you don't want all of the results, but a prepared version so you don't have to download everything. To this end, there's a template file for customized wrapping. You can get this template by typing
 
@@ -269,7 +269,7 @@ $ qsuite set cfg <filename>
 $ qsuite set sim <filename>
 ```
 
-### Copy Files from the Server directory to your local directory
+### Copy files from the server directory to your local working directory
 
 ```bash
 $ qsuite get <filename without path> #get file from server directory
@@ -278,7 +278,7 @@ $ qsuite get results #get customly wrapped files from server/result directory (y
 $ qsuite get all     #get all wrapped files from server/result directory
 ```
 
-### Copy Files to the server directory from your local
+### Copy files to the server directory from your local working directory
 
 ```bash
 $ qsuite scp <filename without path>
@@ -286,7 +286,9 @@ $ qsuite scp <filename without path>
 
 Alternatively: `$ qsuite sftp <filename>` or `$ qsuite ftp <filename>` (internally, copying is done via the sftp protocol).
 
-### Execute a Command on the Server
+### Execute a command on the server
+
+Careful! It's not interactive yet, so you won't be able to enter passwords or answer questions or enything of that matter.
 
 ```bash
 $ qsuite ssh "command series"
