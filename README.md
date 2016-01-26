@@ -184,7 +184,7 @@ Three files appeared in your directory.
 $ qsuite submit
 ```
 
-Easy, no?
+Alternatively `$ qsuite start`. This will create a local directory `results_${name}` where all your relevant files will be copied to. It then copies all relevant files to the queueing system and submits the job.  
 
 ## Basic Functions
 
@@ -195,7 +195,46 @@ Once the job is finished, do
 $ qsuite wrap
 ```
 
-### Add other Files to the configuration (to be copied to server) or remove
+The results are now stored in `${serverpath}/results/results.p and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`.
+
+### Customized Wrapping
+
+Often you don't want all of the results, but a prepared version so you don't have to download everything. To this end, there's a template file for customized wrapping. You can get this template by typing
+
+```bash
+$ qsuite init customwrap
+```
+
+This copies the template to your working directory and will scp it to the server directory when you submit the job. In cas you already have a customwrap-file, you can add it as
+
+```bash
+$ qsuite set customwrap <filename>
+```
+
+When the job is done and the results are wrapped with `$ qsuite wrap`, you can call
+
+```bash
+$ qsuite customwrap
+$ qsuite get
+```
+
+and the customly wrapped results will be copied to your local results directory.
+
+### Update git repositories on the server
+
+In the configuration file you can add git repositories which should be updated on the server. Add them to the list `git\_repos` as a tuple. The first entry of the tuple should be the absolute path to the repository on the server and the second entry should be code which has to be executed after pulling (e.g. `python setup.py install --user`). Optionally, you can add a third tuple entry with the remote address of the repository (in case the repository is not yet present on the server). If everything's configured, you can do
+
+```bash
+$ qsuite gitupdate  #or shorter:
+$ qsuite git
+```
+
+to update everything necessary on the server.
+
+
+### Add other files that qsuite should copy to the server
+
+(or remove, s.t. those won't be copied anymore).
 
 ```bash
 $ qsuite add <filename(s)>
@@ -231,6 +270,8 @@ $ qsuite get all     #get all wrapped files from server/result directory
 ```bash
 $ qsuite scp <filename without path>
 ```
+
+Alternatively: `$ qsuite sftp <filename>` or `$ qsuite ftp <filename>` (internally, copying is done via the sftp protocol).
 
 ### Execute a Command on the Server
 
