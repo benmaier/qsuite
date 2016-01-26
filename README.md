@@ -222,14 +222,27 @@ and the customly wrapped results will be copied to your local results directory.
 
 ### Update git repositories on the server
 
-In the configuration file you can add git repositories which should be updated on the server. Add them to the list `git\_repos` as a tuple. The first entry of the tuple should be the absolute path to the repository on the server and the second entry should be code which has to be executed after pulling (e.g. `python setup.py install --user`). Optionally, you can add a third tuple entry with the remote address of the repository (in case the repository is not yet present on the server). If everything's configured, you can do
+In the configuration file you can add git repositories which should be updated on the server. Add them to the list `git_repos` as a tuple. The first entry of the tuple should be the absolute path to the repository on the server and the second entry should be code which has to be executed after pulling (e.g. `python setup.py install --user`). Optionally, you can add a third tuple entry with the remote address of the repository (in case the repository is not yet present on the server). 
+
+So the section in the configuration file could look like:
+
+```python
+git_repos = [
+              ( "/home/"+username+"/qsuite",
+                "python setup.py install --user",
+                "https://github.com/benmaier/qsuite.git"
+              )
+            ]
+```
+
+If everything's configured, you can do
 
 ```bash
 $ qsuite gitupdate  #or shorter:
 $ qsuite git
 ```
 
-to update everything necessary on the server.
+to update everything necessary on the server. You don't have to, because `$ qsuite submit` will do that anyway.
 
 
 ### Add other files that qsuite should copy to the server
