@@ -299,7 +299,17 @@ This will copy the file to the `.qsuite` directory in the user's home directory.
 ```bash
 $ qsuite set defaultcfg <filename>
 $ qsuite set defaultsim <filename>
+$ qsuite set defaultcustomwrap <filename>
 ```
+
+You can reset this to the initial template files via
+
+```bash
+$ qsuite reset defaultcfg 
+$ qsuite reset defaultsim 
+$ qsuite reset defaultcustomwrap 
+```
+
 
 ### Checking the job status
 
@@ -310,5 +320,6 @@ $ qsuite qstat job  #shows the status of the current job
 ```
 
 Alternatives to `qstat` are `stat` and `status`.
+
 
 
