@@ -186,5 +186,75 @@ $ qsuite submit
 
 Easy, no?
 
+## Basic Functions
+
+### Wrap the results
+Once the job is finished, do
+
+```bash
+$ qsuite wrap
+```
+
+### Add other Files to the configuration (to be copied to server) or remove
+
+```bash
+$ qsuite add <filename(s)>
+$ qsuite rm <filename(s)>
+```
+
+This does not remove the file from the local directory. It just won't be copied anymore.
+
+### Add a shell script to be executed before submission
+
+```bash
+$ qsuite set exec <filename>
+```
+
+### Change the filenames of the configuration and simulation files to other files
+
+```bash
+$ qsuite set cfg <filename>
+$ qsuite set sim <filename>
+```
+
+### Copy Files from the Server directory to your local directory
+
+```bash
+$ qsuite get <filename without path> #get file from server directory
+$ qsuite get         #get customly wrapped files from server/result directory
+$ qsuite get results #get customly wrapped files from server/result directory (yes, same as $ qsuite get)
+$ qsuite get all     #get all wrapped files from server/result directory
+```
+
+### Copy Files to the server directory from your local
+
+```bash
+$ qsuite scp <filename without path>
+```
+
+### Execute a Command on the Server
+
+```bash
+$ qsuite ssh "command series"
+```
+
+### Change the default files for configuration and simulation
+
+This will copy the file to the `.qsuite` directory in the user's home directory.
+
+```bash
+$ qsuite set defaultcfg <filename>
+$ qsuite set defaultsim <filename>
+```
+
+### Checking the job status
+
+```bash
+$ qsuite qstat      #shows all jobs of the user 
+$ qsuite qstat all  #shows the whole queue
+$ qsuite qstat job  #shows the status of the current job
+```
+
+Alternatives to `qstat` are `stat` and `status`.
 
 
