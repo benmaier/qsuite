@@ -261,17 +261,22 @@ def main():
                 sftp_put_files(ssh,cf,files_dests)
             elif cmd in get_cmds:
                 #get the wrapped result
-                get_all =  len(args)>1 and args[1]=="all"
+                if len(args)>1 and args[1] not in ["all","results","allresults"]:
+                    filenames = args[1:]
+                    files_dests = [ (cf.serverpath+"/"+f, os.path.join(cwd,cf.localpath,f)) for f in filenames ]
+                    sftp_get_files(ssh,cf,files_dests)
+                else:
+                    get_all =  len(args)>1 and args[1] in ["all","allresults"]
 
-                pattern_res = re.compile(r'result.*\.p$')
-                pattern_tim = re.compile(r'time.*\.p$')
-                resultstring = ssh_command(ssh,"ls "+cf.resultpath)
-                resultstring = resultstring.replace("\n"," ")
-                resultlist = [ f for f in resultstring.split(" ") if (f!="" and not f.startswith(".")) ]
-                resultlist = [ r for r in resultlist if not ((not get_all) and ((pattern_res.match(r)) or (pattern_tim.match(r)))) ]
+                    pattern_res = re.compile(r'result.*\.p$')
+                    pattern_tim = re.compile(r'time.*\.p$')
+                    resultstring = ssh_command(ssh,"ls "+cf.resultpath)
+                    resultstring = resultstring.replace("\n"," ")
+                    resultlist = [ f for f in resultstring.split(" ") if (f!="" and not f.startswith(".")) ]
+                    resultlist = [ r for r in resultlist if not ((not get_all) and ((pattern_res.match(r)) or (pattern_tim.match(r)))) ]
 
-                files_dests = [ (cf.resultpath+"/"+f, os.path.join(cwd,cf.localpath,f)) for f in resultlist ]
-                sftp_get_files(ssh,cf,files_dests)
+                    files_dests = [ (cf.resultpath+"/"+f, os.path.join(cwd,cf.localpath,f)) for f in resultlist ]
+                    sftp_get_files(ssh,cf,files_dests)
 
             else:
                 pass
