@@ -20,6 +20,7 @@ from qsuite import start_job
 from qsuite import sftp_put_files
 from qsuite import sftp_get_files
 from qsuite import mkdirp
+from qsuite.queuesys.job import job
 import shutil
 import re
 
@@ -120,6 +121,7 @@ def main():
     sftp_cmds = ["sftp","scp","ftp"]
     customwrap_cmds = ["customwrap"]
     get_cmds = ["get"]
+    test_cmds = ["test"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
@@ -143,7 +145,8 @@ def main():
         #if there's no ".qsuite" file yet, stop operating
         print("Not initialized yet!")
         sys.exit(1)
-    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds + set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds):
+    elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
+                 set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + test_cmds):
 
         qsuiteparser = get_qsuite(qsuitefile)
 
@@ -209,7 +212,14 @@ def main():
 
             if len(args)>1:
                 thing_to_set = args[1:]
-                set_in_qsuite(qsuiteparser,qsuitefile,"add",thing_to_set)
+
+                if "custom_wrap_results.py" in thing_to_set:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"customwrap","custom_wrap_results.py")
+                    thing_to_set.pop(thing_to_set.index("custom_wrap_results.py"))
+
+                if len(thing_to_set)>0:
+                    set_in_qsuite(qsuiteparser,qsuitefile,"add",thing_to_set)
+
                 sys.exit(0)
             else:
                 print("Nothing to add!")
@@ -224,7 +234,22 @@ def main():
                 print("Nothing to remove!")
                 sys.exit(1)
 
-        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds:
+        elif cmd in test_cmds:
+            if len(args)==1:
+                jobid = 0
+                respath = "./.test"
+            elif len(args)==2:
+                jobid = int(args[1])
+                respath = "./.test"
+            elif len(args)>2:
+                jobid = int(args[1])
+                respath = args[2]
+
+            job(jobid,respath)
+            sys.exit(0)                
+
+        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\
+                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + test_cmds:
 
 
             cf = qconfig(qsuiteparser=qsuiteparser)
