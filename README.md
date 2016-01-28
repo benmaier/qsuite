@@ -195,7 +195,7 @@ Once the job is finished, do
 $ qsuite wrap
 ```
 
-The results are now stored in `${serverpath}/results/results.p and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`.
+The results are now stored in `${serverpath}/results/results.p` and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`.
 
 ### Customized wrapping
 
