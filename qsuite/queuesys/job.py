@@ -34,6 +34,8 @@ def job(j,resultpath=None):
     results = [ None for i in range(len(cf.internal_parameter_list)) ]
     times = list(results) #copy
 
+    N_int_param = len(results)
+
     #loop through the internal args
     for ip,internal_params in enumerate(cf.internal_parameter_list):
 
@@ -41,6 +43,10 @@ def job(j,resultpath=None):
         kwargs = cf.get_kwargs(cf.internal_names,cf.internal_parameter_list[ip])
         kwargs.update(job_kwargs)
         kwargs.update(cf.std_kwargs)
+
+        #add seed
+        if cf.seed>=0:
+            kwargs['seed'] = N_int_param*j + ip + cf.seed
         
         t_start = time.time()
 
