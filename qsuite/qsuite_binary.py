@@ -237,10 +237,10 @@ def main():
         elif cmd in test_cmds:
             if len(args)==1:
                 jobid = 0
-                respath = "./.test"
+                respath = os.path.join(os.getcwd()+".test")
             elif len(args)==2:
                 jobid = int(args[1])
-                respath = "./.test"
+                respath = os.path.join(os.getcwd()+".test")
             elif len(args)>2:
                 jobid = int(args[1])
                 respath = args[2]

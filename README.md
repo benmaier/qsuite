@@ -323,5 +323,12 @@ $ qsuite qstat job  #shows the status of the current job
 
 Alternatives to `qstat` are `stat` and `status`.
 
+### Testing the simulation locally
+```bash
+$ qsuite test                    # tests job with external job id 0 and saves in ./.test
+$ qsuite test $EXTERNALJOBID     # tests job with given external job id and saves in ./.test
+$ qsuite test $EXTERNALJOBID <directory>    # tests job with given external job id and saves in <directory>
+```
+
 
 
