@@ -46,7 +46,10 @@ def job(j,resultpath=None):
 
         #add seed
         if cf.seed>=0:
-            kwargs['seed'] = N_int_param*j + ip + cf.seed
+            key = 'seed'
+            if key in kwargs:
+                key = 'randomseed'
+            kwargs[key] = N_int_param*j + ip + cf.seed
         
         t_start = time.time()
 
