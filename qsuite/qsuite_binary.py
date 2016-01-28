@@ -237,15 +237,16 @@ def main():
         elif cmd in test_cmds:
             if len(args)==1:
                 jobid = 0
-                respath = os.path.join(os.getcwd()+".test")
+                respath = os.path.join(os.getcwd(),".test")
             elif len(args)==2:
                 jobid = int(args[1])
-                respath = os.path.join(os.getcwd()+".test")
+                respath = os.path.join(os.getcwd(),".test")
             elif len(args)>2:
                 jobid = int(args[1])
                 respath = args[2]
 
-            job(jobid,respath)
+            cf = qconfig(qsuiteparser=qsuiteparser)
+            job(jobid,respath,cf)
             sys.exit(0)                
 
         elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\

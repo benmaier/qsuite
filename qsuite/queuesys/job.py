@@ -1,10 +1,7 @@
+from __future__ import print_function
 import sys
 import time
 import os
-
-#load simulation located in the file in the current working directory
-sys.path.append(os.getcwd())
-import simulation as simcode
 
 try:
     # Python 2
@@ -20,12 +17,37 @@ if os.path.exists("./qconfig.py"):
 else:
     from qsuite import qconfig
 
-def job(j,resultpath=None):
+def job(j,resultpath=None,cf=None):
 
-    #load configuration
-    cf = qconfig()
-    if resultpath is not None:
+    is_local = cf is not None
+
+    if not is_local:
+        cf = qconfig()
+
+    #get the resultpath from arguments
+    #if no resultpath is given, it is assumed that a local simulation takes place
+    if is_local:
         cf.resultpath = resultpath
+        simcode_path = os.path.join(os.getcwd(),cf.files_to_scp["simulation.py"])
+    else:
+        simcode_path = os.path.join(os.getcwd(),"simulation.py")
+
+    if not os.path.exists(simcode_path):
+        print("No simulation file provided!")
+
+
+    #import the simulation module
+    if sys.version_info[0] == 2:
+        import imp
+        simcode = imp.load_source("sim",simcode_path)
+    elif sys.version_info >= (3,5):
+        import importlib.util
+        specifications = importlib.util.spec_from_file_location("sim",simcode_path)
+        simcode = importlib.util.module_from_spec(specifications)
+        specifications.loader.exec_module(simcode)
+    else:
+        print("Python version",sys.version_info[0],"not supported.")
+        sys.exit(1)
 
     #get kwargs for the simulation of this jobnumber
     job_kwargs = cf.get_kwargs(cf.parameter_names,cf.parameter_list[j])
