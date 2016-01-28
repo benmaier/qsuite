@@ -1,8 +1,16 @@
+from __future__ import print_function
 import os 
 import sys
 import numpy as np
-import itertools
 import ast
+import itertools
+
+try:
+    # Python 2
+    from itertools import izip
+except ImportError:
+    # Python 3
+    izip = zip
 
 class qconfig(object):
 
@@ -36,7 +44,7 @@ class qconfig(object):
         if os.path.exists(self.configpath):
             cf = self.get_cf(self.configpath)
         else:
-            print "No "+filename+" found in current working directory!"
+            print("No "+filename+" found in current working directory!")
             sys.exit(1)
 
 
@@ -130,7 +138,7 @@ class qconfig(object):
     def get_kwargs(self,pnames,current_parameters):
         kwargs = { 
                    name : current_parameters[iname]\
-                   for iname,name in itertools.izip(range(len(pnames)),pnames)\
+                   for iname,name in izip(range(len(pnames)),pnames)\
                    if name is not None 
                  }
 
@@ -141,5 +149,5 @@ if __name__=="__main__":
 
     cf = qconfig()
 
-    print cf.get_param_lists(cf.parameter_names,cf.parameter_list[0])
+    print(cf.get_param_lists(cf.parameter_names,cf.parameter_list[0]))
     

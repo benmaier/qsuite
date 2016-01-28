@@ -1,8 +1,15 @@
+from __future__ import print_function
 from qconfig import qconfig
-import cPickle as pickle
 from numpy import *
 import os
 import sys
+
+try:
+    # Python 2
+    import cPickle as pickle
+except ImportError:
+    # Python 3
+    import pickle
 
 cf = qconfig()
 
@@ -20,9 +27,9 @@ try:
         #get coords in list space from linear index
         pcoords = [ [c] for c in list(unravel_index(j, pdims))]
 
-        time = pickle.load(open(cf.resultpath+"/times_%d.p" % j,'r'))
+        time = pickle.load(open(cf.resultpath+"/times_%d.p" % j,'rb'))
         if not cf.only_save_times:
-            res = pickle.load(open(cf.resultpath+"/results_%d.p" % j,'r'))
+            res = pickle.load(open(cf.resultpath+"/results_%d.p" % j,'rb'))
             #print res
             
         for i in range(len(time)):
@@ -32,8 +39,8 @@ try:
             if not cf.only_save_times:
                 results[flat_index] = res[i]
 except Exception as e:
-    print "*** Caught exception: %s,%s" (e.__class__,e)
-    print "couldn't load all files"
+    print("*** Caught exception: %s,%s" (e.__class__,e))
+    print("couldn't load all files")
     sys.exit(1)
 
 #convert to lists for better portability
@@ -42,11 +49,11 @@ results = results.reshape(pdims+idims).tolist()
 
 try:
     #save the wrapped data
-    pickle.dump(times,open(cf.resultpath+"/times.p",'w'))
+    pickle.dump(times,open(cf.resultpath+"/times.p",'wb'))
     if not cf.only_save_times:
-        pickle.dump(results,open(cf.resultpath+"/results.p",'w'))
+        pickle.dump(results,open(cf.resultpath+"/results.p",'wb'))
 except:
-    print "couldn't write files"
+    print("couldn't write files")
     sys.exit(1)
     
 #delete the original files    

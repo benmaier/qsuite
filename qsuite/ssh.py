@@ -17,11 +17,11 @@ def ssh_command(ssh,command):
     last_line = ''
     complete_received = ''
     while not stdout.channel.exit_status_ready():
-	# Only print data if there is data to read in the channel
+    # Only print data if there is data to read in the channel
         while stdout.channel.recv_ready():
-	    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-	    if len(rl) > 0:
-		# Print data from stdout
+            rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+            if len(rl) > 0:
+        # Print data from stdout
                 recv = stdout.channel.recv(1024)
                 lines = recv.split('\n')
                 if len(lines)>1:

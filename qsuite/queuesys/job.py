@@ -1,9 +1,21 @@
-from qconfig import qconfig
 import sys
 import time
-import cPickle as pickle
 import simulation as simcode
-from itertools import izip
+import os
+
+try:
+    # Python 2
+    from itertools import izip
+    import cPickle as pickle
+except ImportError:
+    # Python 3
+    import pickle
+    izip = zip
+
+if os.path.exists("./qconfig.py"):
+    from qconfig import qconfig
+else:
+    from qsuite import qconfig
 
 #load configuration
 cf = qconfig()
@@ -18,11 +30,11 @@ if len(args)>1:
 job_kwargs = cf.get_kwargs(cf.parameter_names,cf.parameter_list[j])
 
 #prepare result lists
-results = [ None for i in xrange(len(cf.internal_parameter_list)) ]
+results = [ None for i in range(len(cf.internal_parameter_list)) ]
 times = list(results) #copy
 
 #loop through the internal args
-for ip,internal_params in izip(xrange(len(cf.internal_parameter_list)),cf.internal_parameter_list):
+for ip,internal_params in enumerate(cf.internal_parameter_list):
 
     #wrap all kwargs necessary for the simulation
     kwargs = cf.get_kwargs(cf.internal_names,cf.internal_parameter_list[ip])
@@ -39,8 +51,11 @@ for ip,internal_params in izip(xrange(len(cf.internal_parameter_list)),cf.intern
     times[ip] = t_end - t_start
     
 #save results
+if not os.path.exists(cf.resultpath):
+    os.mkdir(cf.resultpath)
+
 if any([result is not None for result in results]) and not cf.only_save_times:
-    pickle.dump(results,open(cf.resultpath+'/results_%d.p' % (j),'w'),protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(results,open(cf.resultpath+'/results_%d.p' % (j),'wb'),protocol=pickle.HIGHEST_PROTOCOL)
 
 #save times needed
-pickle.dump(times,open(cf.resultpath+'/times_%d.p' % (j),'w'),protocol=pickle.HIGHEST_PROTOCOL)
+pickle.dump(times,open(cf.resultpath+'/times_%d.p' % (j),'wb'),protocol=pickle.HIGHEST_PROTOCOL)
