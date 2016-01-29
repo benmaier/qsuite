@@ -141,7 +141,7 @@ Three files appeared in your directory.
    standard_parameters = [
                            ( 'dt', dts[1] ),
                            ( 'x0', x0s[0] ),
-                           ( 'maxt', runtimes[-1] ),
+                           ( 'tmax', runtimes[-1] ),
                           ]
     #if this is true, only the simulation time will be saved and wrapped
    only_save_times = False
@@ -292,7 +292,7 @@ Alternatively: `$ qsuite sftp <filename>` or `$ qsuite ftp <filename>` (internal
 
 ### Execute a command on the server
 
-Careful! It's not interactive yet, so you won't be able to enter passwords or answer questions or enything of that matter.
+Careful! It's not interactive yet, so you won't be able to enter passwords or answer questions or anything of that matter.
 
 ```bash
 $ qsuite ssh "command series"
