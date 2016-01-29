@@ -129,8 +129,8 @@ Three files appeared in your directory.
 
    #this will have BrownianMotions()'s function parameter names
    external_parameters = [
-                           ( 'Ls', Ls   ),
-                           ( 'rs', rs   ),
+                           ( 'L', Ls   ),
+                           ( 'r', rs   ),
                            ( None   , measurements ),
                           ]
    internal_parameters = [
