@@ -3,6 +3,7 @@ from qconfig import qconfig
 from numpy import *
 import os
 import sys
+import gzip
 
 try:
     # Python 2
@@ -34,7 +35,7 @@ try:
             
         for i in range(len(time)):
             icoords = [ [c] for c in list(unravel_index(i, idims)) ]
-            flat_index = ravel_multi_index(pcoords+icoords,pdims+idims)
+            flat_index = ravel_multi_index(pcoords+icoords,pdims+idims)[0]
             times[flat_index] = time[i]
             if not cf.only_save_times:
                 results[flat_index] = res[i]
@@ -43,18 +44,20 @@ except Exception as e:
     print("couldn't load all files")
     sys.exit(1)
 
+
 #convert to lists for better portability
 times = times.reshape(pdims+idims).tolist()
 results = results.reshape(pdims+idims).tolist()
 
 try:
     #save the wrapped data
-    pickle.dump(times,open(cf.resultpath+"/times.p",'wb'))
+    pickle.dump(times,gzip.open(cf.resultpath+"/times.p",'wb'))
     if not cf.only_save_times:
-        pickle.dump(results,open(cf.resultpath+"/results.p",'wb'))
+        pickle.dump(results,gzip.open(cf.resultpath+"/results.p",'wb'))
 except:
     print("couldn't write files")
     sys.exit(1)
+
     
 #delete the original files    
 for j in range(cf.jmax+1):

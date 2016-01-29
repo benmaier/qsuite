@@ -1,6 +1,7 @@
 from numpy import *
 import os
 from qconfig import qconfig
+import gzip
 
 #============== for python 2/3 compatibility =====================
 try:
@@ -37,12 +38,12 @@ def prepare_results(res):
 
 #==============================================================================
 
-times = pickle.load(open(cf.resultpath+"/times.p",'rb'))
+times = pickle.load(gzip.open(cf.resultpath+"/times.p",'rb'))
 time,err = mean_and_err(array(times))
 savez(cf.resultpath+"/mean_err_times.npz",time,err)
 
 if not cf.only_save_times:
-    results = pickle.load(open(cf.resultpath+"/results.p",'rb'))
+    results = pickle.load(gzip.open(cf.resultpath+"/results.p",'rb'))
     results = prepare_results(array(results))
     if isinstance(results,(list,tuple)):
         savez(cf.resultpath+"/mean_err_result_list.npz",*results)
