@@ -22,6 +22,7 @@ def get_jobscript(cf):
                 cf.jmax+1,
                 cf.serverpath+"/output",
                 cf.serverpath+"/output",
+                cf.priority,
                 cf.pythonpath,
                 cf.serverpath,
                 )
