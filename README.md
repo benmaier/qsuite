@@ -195,7 +195,8 @@ Once the job is finished, do
 $ qsuite wrap
 ```
 
-The results are now stored in `${serverpath}/results/results.p` and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`.
+The results are now stored in `${serverpath}/results/results.p` and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`. 
+Beware! Pickled files will be compressed with the `gzip` module. Load them with `import pickle; import gzip; pickle.load(gzip.open('filename','rb'))`.
 
 ### Customized wrapping
 
@@ -219,6 +220,7 @@ $ qsuite get
 ```
 
 and the customly wrapped results will be copied to your local results directory.
+Beware! The pickled result files will be compressed with the `gzip` module. Load them with `import pickle; import gzip; pickle.load(gzip.open('filename','rb'))`.
 
 ### Update git repositories on the server
 
@@ -277,6 +279,8 @@ $ qsuite get         #get customly wrapped files from server/result directory
 $ qsuite get results #get customly wrapped files from server/result directory (yes, same as $ qsuite get)
 $ qsuite get all     #get all wrapped files from server/result directory
 ```
+
+Beware! Pickled files will be compressed with the `gzip` module. Load them with `import pickle; import gzip; pickle.load(gzip.open('filename','rb'))`.
 
 ### Copy files to the server directory from your local working directory
 
