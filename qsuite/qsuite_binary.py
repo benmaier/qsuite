@@ -118,7 +118,7 @@ def main():
     wrap_cmds = ["wrap","wrapresults","wrap_results"]
     status_cmds = ["stat","qstat","status"]
     ssh_cmds = ["ssh"]
-    sftp_cmds = ["sftp","scp","ftp"]
+    sftp_cmds = ["sftp","scp","ftp","put"]
     customwrap_cmds = ["customwrap"]
     get_cmds = ["get"]
     test_cmds = ["test"]
