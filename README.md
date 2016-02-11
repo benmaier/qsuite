@@ -170,7 +170,7 @@ Three files appeared in your directory.
    #since we need the updated source code of the brownian_motion module on the server,
    #we add the git repo to get updated and installed.
    git_repos = [
-                   ( "/home/"+username+"/brownian-motion", "python setup.py install --user" )
+                   ( "/home/"+username+"/brownian-motion", pythonpath + " setup.py install --user" )
                 ]
    ```
 
