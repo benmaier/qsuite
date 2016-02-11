@@ -17,6 +17,31 @@ if os.path.exists("./qconfig.py"):
 else:
     from qsuite import qconfig
 
+def _update_progress(progress, bar_length=40, status=""):        
+        """
+        This function was coded by Marc Wiedermann (https://github.com/marcwie)
+
+        Draw a progressbar according to the actual progress of a calculation.
+
+        Call this function again to update the progressbar.
+
+        :type progress: number (float)
+        :arg  progress: Percentile of progress of a current calculation.
+
+        :type bar_length: number (int)
+        :arg  bar_length: The length of the bar in the commandline.
+
+        :type status: str
+        :arg  status: A message to print behing the progressbar.
+        """
+        block = int(round(bar_length*progress))
+        text = "\r[{0}] {1}% {2}".format("="*block + " "*(bar_length-block),
+                                         round(progress, 3)*100, status)
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        if progress >= 1:
+            sys.stdout.write("\n")
+
 def job(j,resultpath=None,cf=None):
 
     is_local = cf is not None
@@ -81,6 +106,8 @@ def job(j,resultpath=None,cf=None):
         t_end = time.time()
         
         times[ip] = t_end - t_start
+
+        _update_progress((ip + 1.)/N_int_param)
         
     #save results
     if not os.path.exists(cf.resultpath):
