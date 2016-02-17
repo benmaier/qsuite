@@ -95,4 +95,9 @@ def start_job(cf,ssh):
     else:
         print("Unknown queue:",cf.queue)
         sys.exit(1)
+
+    N = len(cf.parameter_list)-1
+    filepath = cf.serverpath + "/output/progress_"
+    cmd = ('for i in `seq 0 %d`; do echo " " > '+filepath+'$i; done;') % N
+    ssh_command(ssh,cmd)
     

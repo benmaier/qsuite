@@ -21,6 +21,8 @@ from qsuite import sftp_put_files
 from qsuite import sftp_get_files
 from qsuite import mkdirp
 from qsuite import print_params
+from qsuite import print_status
+from qsuite import print_params_and_status
 from qsuite.queuesys.job import job
 import shutil
 import re
@@ -117,7 +119,8 @@ def main():
     add_cmds = ["add"]
     rm_cmds = ["rm","remove"]
     wrap_cmds = ["wrap","wrapresults","wrap_results"]
-    status_cmds = ["stat","qstat","status"]
+    qstatus_cmds = ["qstat","qstatus"]
+    status_cmds = ["stat","status"]
     ssh_cmds = ["ssh"]
     sftp_cmds = ["sftp","scp","ftp","put"]
     customwrap_cmds = ["customwrap"]
@@ -149,7 +152,7 @@ def main():
         sys.exit(1)
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
                  set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
-                 get_cmds + test_cmds + param_cmds):
+                 get_cmds + test_cmds + param_cmds + qstatus_cmds):
 
         qsuiteparser = get_qsuite(qsuitefile)
 
@@ -257,7 +260,7 @@ def main():
             print_params(cf)
 
         elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\
-                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds:
+                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + qstatus_cmds:
 
             cf = qconfig(qsuiteparser=qsuiteparser)
             ssh = ssh_connect(cf)
@@ -283,9 +286,16 @@ def main():
             elif cmd in customwrap_cmds:
                 custom_wrap_results(cf,ssh)
                 sys.exit(0)
-            elif cmd in status_cmds:
+            elif cmd in qstatus_cmds:
                 cmds = args[1:]
                 qstat(cf,ssh,cmds)
+                sys.exit(0)
+            elif cmd in status_cmds:
+                cmds = args[1:]
+                if len(cmds)>0:
+                    print_params_and_status(cf,ssh)
+                else:
+                    print_status(cf,ssh)
                 sys.exit(0)
             elif cmd in ssh_cmds:
                 cmds = args[1:]

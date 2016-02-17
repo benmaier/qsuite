@@ -2,6 +2,7 @@ from __future__ import print_function
 import sys
 import time
 import os
+from numpy import mean
 
 try:
     # Python 2
@@ -41,6 +42,34 @@ def _update_progress(progress, bar_length=40, status=""):
         sys.stdout.flush()
         if progress >= 1:
             sys.stdout.write("\n")
+
+def _get_timeleft_string(t):
+    d, remainder = divmod(t,24*60*60)
+    h, remainder = divmod(remainder,60*60)
+    m, s = divmod(remainder,60)
+    t = [d,h,m,s]
+    t_str = ["%dd", "%dh", "%dm", "%ds"]
+    it = 0 
+    while t[it]==0. and it<4:
+        it += 1
+    text = (" ".join(t_str[it:it+2])) % tuple(t[it:it+2])
+    return text
+    
+
+def _update_progress_file(progress_id, N_id, times, filename, bar_length=40):
+
+    progress = (progress_id+1.) / float(N_id)
+    block = int(round(bar_length*progress))
+    if len(times)>0:
+        timeleft = int((N_id-progress_id-1) * mean(times))
+        timeleft = _get_timeleft_string(timeleft)
+    else:
+        timeleft = ""
+    
+    text = "\r[{0}] {1}%__{2}".format("="*block + " "*(bar_length-block),
+                                     round(progress, 3)*100, timeleft)
+    with open(filename,"w") as progressfile:
+        progressfile.write(text)
 
 def job(j,resultpath=None,cf=None):
 
@@ -107,7 +136,10 @@ def job(j,resultpath=None,cf=None):
         
         times[ip] = t_end - t_start
 
-        _update_progress((ip + 1.)/N_int_param)
+        if is_local:
+            _update_progress((ip + 1.)/N_int_param)
+        else:
+            _update_progress_file(ip,N_int_param,times[:ip+1],cf.serverpath+"/output/progress_%d" % j)
         
     #save results
     if not os.path.exists(cf.resultpath):

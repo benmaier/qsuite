@@ -3,7 +3,7 @@ import select
 import os
 import sys
 
-def ssh_command(ssh,command):
+def ssh_command(ssh,command,noprint=False):
     """
     this is adapted from code by Sebastian Dahlgren
     http://sebastiandahlgren.se/2012/10/11/using-paramiko-to-send-ssh-commands/
@@ -32,7 +32,8 @@ def ssh_command(ssh,command):
                     last_line = ''
                     received = recv
                 complete_received += received
-                sys.stdout.write(received)
+                if not noprint:
+                    sys.stdout.write(received)
 
     while stdout.channel.recv_ready():
         rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
@@ -48,15 +49,17 @@ def ssh_command(ssh,command):
                 last_line = ''
                 received = recv
             complete_received += received
-            sys.stdout.write(received)
+            if not noprint:
+                sys.stdout.write(received)
 
                 
     if (last_line is not None) and (last_line != "") and (not last_line.endswith("\n")):
-        sys.stdout.write(last_line+"\n")
+        if not noprint:
+            sys.stdout.write(last_line+"\n")
         complete_received += last_line+"\n"
 
     err = '\n'.join(stderr.read().split('\n')[:-1])
-    if err != '':
+    if err != '' and not noprint:
         print(err)
 
     return complete_received
