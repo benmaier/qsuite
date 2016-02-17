@@ -11,6 +11,7 @@ setup(name='qsuite',
       install_requires=[
           'numpy',
           'paramiko',
+          'tabulate',
       ],
       dependency_links=[
           ],

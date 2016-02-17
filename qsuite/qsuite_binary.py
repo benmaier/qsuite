@@ -148,7 +148,8 @@ def main():
         print("Not initialized yet!")
         sys.exit(1)
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
-                 set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + test_cmds):
+                 set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
+                 get_cmds + test_cmds + param_cmds):
 
         qsuiteparser = get_qsuite(qsuitefile)
 
@@ -251,9 +252,12 @@ def main():
             job(jobid,respath,cf)
             sys.exit(0)                
 
-        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\
-                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + test_cmds:
+        elif cmd in param_cmds:
+            cf = qconfig(qsuiteparser=qsuiteparser)
+            print_params(cf)
 
+        elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\
+                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds:
 
             cf = qconfig(qsuiteparser=qsuiteparser)
             ssh = ssh_connect(cf)
