@@ -64,7 +64,7 @@ def _update_progress_file(progress_id, N_id, times, filename, bar_length=40):
         timeleft = int((N_id-progress_id-1) * mean(times))
         timeleft = _get_timeleft_string(timeleft)
     else:
-        timeleft = ""
+        timeleft = "no estimate yet"
     
     text = "\r[{0}] {1}%__{2}".format("="*block + " "*(bar_length-block),
                                      round(progress, 3)*100, timeleft)
@@ -114,6 +114,10 @@ def job(j,resultpath=None,cf=None):
 
     #loop through the internal args
     for ip,internal_params in enumerate(cf.internal_parameter_list):
+
+        #if this is the first run, initiate the progress bar
+        if not is_local and ip==0:
+            _update_progress_file(ip-1,N_int_param,[],cf.serverpath+"/output/progress_%d" % j)
 
         #wrap all kwargs necessary for the simulation
         kwargs = cf.get_kwargs(cf.internal_names,cf.internal_parameter_list[ip])

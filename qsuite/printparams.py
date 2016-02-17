@@ -24,7 +24,7 @@ def _get_progress(cf,ssh):
     cmd = ('for i in `seq 0 %d`; do cat '+filepath+'$i; done;') % N
     progresses = ssh_command(ssh,cmd,noprint=True)
     progresses = progresses.split("\n")[:-1]
-    progresses = [ p.split("__") if len(p)>1 else ['',''] for p in progresses ]
+    progresses = [ p.split("__") if len(p)>1 else ['waiting...',''] for p in progresses ]
 
     return progresses
 
