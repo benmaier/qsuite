@@ -50,4 +50,4 @@ def print_params_and_status(cf,ssh):
     names = [ n if not (n is None and len(cf.external_parameters[i][1])==cf.N_measurements) else "Meas.ID" for i,n in enumerate(cf.parameter_names)  ]
     names = ["Job ID"] + names + ["Array ID",  "Progress", "Rem. Time" ]
 
-    print(tabulate(params, headers = names))
+    print(tabulate(table, headers = names))
