@@ -20,6 +20,7 @@ from qsuite import start_job
 from qsuite import sftp_put_files
 from qsuite import sftp_get_files
 from qsuite import mkdirp
+from qsuite import print_params
 from qsuite.queuesys.job import job
 import shutil
 import re
@@ -122,6 +123,7 @@ def main():
     customwrap_cmds = ["customwrap"]
     get_cmds = ["get"]
     test_cmds = ["test"]
+    param_cmds = ["params"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
