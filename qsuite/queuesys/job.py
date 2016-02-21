@@ -50,7 +50,7 @@ def _get_timeleft_string(t):
     t = [d,h,m,s]
     t_str = ["%dd", "%dh", "%dm", "%ds"]
     it = 0 
-    while t[it]==0. and it<4:
+    while it<4 and t[it]==0.:
         it += 1
     text = (" ".join(t_str[it:it+2])) % tuple(t[it:it+2])
     return text
@@ -60,16 +60,21 @@ def _update_progress_file(progress_id, N_id, times, filename, bar_length=40):
 
     progress = (progress_id+1.) / float(N_id)
     block = int(round(bar_length*progress))
-    if len(times)>0:
+    if progress_id==N_id-1:
+        timeleft = "done"
+    elif len(times)>0:
         timeleft = int((N_id-progress_id-1) * mean(times))
         timeleft = _get_timeleft_string(timeleft)
     else:
         timeleft = "no estimate yet"
     
-    text = "\r[{0}] {1}%__{2}".format("="*block + " "*(bar_length-block),
+    text = "[{0}] {1}%__{2}\n".format("="*block + " "*(bar_length-block),
                                      round(progress, 3)*100, timeleft)
-    with open(filename,"w") as progressfile:
-        progressfile.write(text)
+
+    print(text)
+    progressfile = open(filename,"w")
+    progressfile.write(text)
+    progressfile.close()
 
 def job(j,resultpath=None,cf=None):
 
