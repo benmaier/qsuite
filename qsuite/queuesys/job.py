@@ -3,6 +3,8 @@ import sys
 import time
 import os
 from numpy import mean
+from numpy import std
+from numpy import sqrt
 
 try:
     # Python 2
@@ -146,7 +148,10 @@ def job(j,resultpath=None,cf=None):
         times[ip] = t_end - t_start
 
         if is_local:
-            _update_progress((ip + 1.)/N_int_param)
+            if ip>0:
+                _update_progress((ip + 1.)/N_int_param,40,"est. time per measurement: "+ str(mean(times[:ip+1])) + " +/- " + str(std(times[:ip+1])/sqrt(ip+1)) )
+            else:
+                _update_progress((ip + 1.)/N_int_param,40,"est. time per measurement: "+ str(mean(times[:ip+1])) )
         else:
             _update_progress_file(ip,N_int_param,times[:ip+1],cf.serverpath+"/output/progress_%d" % j)
         
