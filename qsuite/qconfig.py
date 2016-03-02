@@ -82,7 +82,7 @@ class qconfig(object):
         return cf
 
     def inherit_properties(self,cf):
-        new_props = [ prop for prop in dir(cf) if not prop.startswith('__') and not callable(getattr(cf,prop)) ]
+        new_props = [ prop for prop in dir(cf) if not prop.startswith('__') ]
 
         for p in new_props:
             self.__dict__[p] = cf.__dict__[p]
