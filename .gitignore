@@ -9,5 +9,6 @@
 /build/
 /bin/
 /test*/
+/project*/
 
 .DS_Store
