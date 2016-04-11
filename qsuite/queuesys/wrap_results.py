@@ -3,7 +3,7 @@ from qconfig import qconfig
 from numpy import *
 import os
 import sys
-import gzip
+#import gzip
 
 try:
     # Python 2
@@ -51,9 +51,9 @@ results = results.reshape(pdims+idims).tolist()
 
 try:
     #save the wrapped data
-    pickle.dump(times,gzip.open(cf.resultpath+"/times.p",'wb'))
+    pickle.dump(times,open(cf.resultpath+"/times.p",'wb'))
     if not cf.only_save_times:
-        pickle.dump(results,gzip.open(cf.resultpath+"/results.p",'wb'))
+        pickle.dump(results,open(cf.resultpath+"/results.p",'wb'))
 except:
     print("couldn't write files")
     sys.exit(1)

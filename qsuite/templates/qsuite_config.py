@@ -2,6 +2,8 @@ import os
 
 #=========== SIMULATION DETAILS ========
 projectname = "project"
+basename = "experimentname"
+
 seed = -1
 N_measurements = 1
 
@@ -41,7 +43,6 @@ useratserver = username + u'@' + server
 
 shell = "/bin/bash"
 pythonpath = "python"
-basename = "experimentname"
 name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
 serverpath = "/home/"+username +"/"+ projectname + "/" + name 
 resultpath = serverpath + "/results"
@@ -51,10 +52,6 @@ localpath = os.path.join(os.getcwd(),"results_"+name)
 
 #========================
 git_repos = [
-                ( "/path/to/repo", "python setup.py install --user" )
+                ( "/path/to/repo", pythonpath + " setup.py install --user" )
             ]
 
-
-#============ FILES TO COPY TO SERVER =============
-scp_files = []
-code_after_scp = """ """
