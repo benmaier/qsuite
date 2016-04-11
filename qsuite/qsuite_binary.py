@@ -36,7 +36,7 @@ def update_git(cf,ssh):
     for repo in cf.git_repos:
 
         if len(repo)==3:
-            repostring += 'if [ ! -d "$DIRECTORY" ]; then\ngit clone %s %s\nfi\n' % (repo[2],repo[0])
+            repostring += 'if [ ! -d "%s" ]; then\ngit clone %s %s\nfi\n' % (repo[0],repo[2],repo[0])
 
         repostring += "cd %s; git fetch; git pull; %s; " % tuple(repo[:2])
 
