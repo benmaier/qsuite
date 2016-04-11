@@ -1,3 +1,4 @@
+from __future__ import print_function
 import paramiko
 import select
 import os
@@ -84,6 +85,35 @@ def ssh_connect(cf):
 
     return ssh
 
+def print_progress(transferred, toBeTransferred):
+    progress = transferred / float(toBeTransferred)
+    _update_progress(progress)
+
+def _update_progress(progress, bar_length=40, status=""):        
+    """
+    This function was coded by Marc Wiedermann (https://github.com/marcwie)
+
+    Draw a progressbar according to the actual progress of a calculation.
+
+    Call this function again to update the progressbar.
+
+    :type progress: number (float)
+    :arg  progress: Percentile of progress of a current calculation.
+
+    :type bar_length: number (int)
+    :arg  bar_length: The length of the bar in the commandline.
+
+    :type status: str
+    :arg  status: A message to print behing the progressbar.
+    """
+    block = int(round(bar_length*progress))
+    text = "\r[{0}] {1}% {2}".format("="*block + " "*(bar_length-block),
+                                     round(progress, 3)*100, status)
+    sys.stdout.write(text)
+    sys.stdout.flush()
+    #if progress >= 1:
+    #    sys.stdout.write("\n")
+
 def sftp_put_files(ssh,cf,files_destinations):
 
     ssh_command(ssh,
@@ -95,7 +125,8 @@ def sftp_put_files(ssh,cf,files_destinations):
 
     for f,d in files_destinations:
         print(" "+f+"\n =>"+d)
-        ftp.put(f,d)
+        ftp.put(f,d,callback=print_progress)
+        sys.stdout.write("\n")
 
 def sftp_get_files(ssh,cf,files_destinations):
 
@@ -103,4 +134,5 @@ def sftp_get_files(ssh,cf,files_destinations):
 
     for f,d in files_destinations:
         print(" "+f+"\n =>"+d)
-        ftp.get(f,d)
+        ftp.get(f,d,callback=print_progress)
+        sys.stdout.write("\n")
