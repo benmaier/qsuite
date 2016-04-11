@@ -11,4 +11,6 @@
 /test*/
 /project*/
 
+*.key
+
 .DS_Store
