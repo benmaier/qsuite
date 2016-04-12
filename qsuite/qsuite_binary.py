@@ -309,7 +309,9 @@ def main():
                 #get the wrapped result
                 if len(args)>1 and args[1] not in ["all","results","allresults"]:
                     filenames = args[1:]
-                    files_dests = [ (cf.serverpath+"/"+f, os.path.join(cwd,cf.localpath,f)) for f in filenames ]
+                    local_filenames = [ f.split('/')[-1] for f in filenames ]
+                    files_dests = [ (cf.serverpath+"/"+f, os.path.join(cwd,cf.localpath,local_f)) \
+                                    for f,local_f in zip(filenames,local_filenames) ]
                     sftp_get_files(ssh,cf,files_dests)
                 else:
                     get_all =  len(args)>1 and args[1] in ["all","allresults"]
