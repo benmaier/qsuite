@@ -46,6 +46,7 @@ def update_git(cf,ssh):
 
 def wrap_results(cf,ssh):
     ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " wrap_results.py;")
+    ssh_command(ssh, "cd " + cf.serverpath + "/results; gzip results.p" )
     custom_wrap_results(cf,ssh)
 
 def custom_wrap_results(cf,ssh):
@@ -282,6 +283,7 @@ def main():
                 sys.exit(0)
             elif cmd in wrap_cmds:
                 wrap_results(cf,ssh)
+                ssh_command
                 sys.exit(0)
             elif cmd in customwrap_cmds:
                 custom_wrap_results(cf,ssh)
