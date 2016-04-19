@@ -40,7 +40,7 @@ try:
             if not cf.only_save_times:
                 results[flat_index] = res[i]
 except Exception as e:
-    print("*** Caught exception: %s,%s" (e.__class__,e))
+    print("*** Caught exception: %s,%s" % (e.__class__,e))
     print("couldn't load all files")
     sys.exit(1)
 
