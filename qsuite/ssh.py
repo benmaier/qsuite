@@ -116,11 +116,23 @@ def _update_progress(progress, bar_length=40, status=""):
 
 def sftp_put_files(ssh,cf,files_destinations):
 
-    ssh_command(ssh,
-                "mkdir -p "+cf.serverpath+"; "+\
-                "mkdir -p "+cf.resultpath+"; "+\
-                "mkdir -p "+cf.serverpath+"/output")
+    #ssh_command(ssh,
+    #            "mkdir -p "+cf.serverpath+"; "+\
+    #            "mkdir -p "+cf.resultpath+"; "+\
+    #            "mkdir -p "+cf.serverpath+"/output")
+    
+    #additional_directories = set([cf.serverpath, cf.resultpath, cf.serverpath+"/output"])
+    all_directories = set()
+    mkdir_p_string = ""
 
+    for f,d in files_destinations:
+        directory = '/' + '/'.join(d.split('/')[:-1])
+
+        if directory not in all_directories:
+            all_directories.add(directory)
+            mkdir_p_string += 'mkdir -p ' + directory + "; "
+
+    ssh_command(ssh,mkdir_p_string)
     ftp = ssh.open_sftp()
 
     for f,d in files_destinations:
