@@ -123,7 +123,7 @@ def sftp_put_files(ssh,cf,files_destinations):
     
     #additional_directories = set([cf.serverpath, cf.resultpath, cf.serverpath+"/output"])
     all_directories = set()
-    mkdir_p_string = ""
+    mkdir_p_string = "mkdir -p "+cf.serverpath+"/output; "
 
     for f,d in files_destinations:
         directory = '/' + '/'.join(d.split('/')[:-1])
