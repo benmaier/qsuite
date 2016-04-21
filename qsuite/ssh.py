@@ -126,7 +126,7 @@ def sftp_put_files(ssh,cf,files_destinations):
     mkdir_p_string = "mkdir -p "+cf.serverpath+"/output; "
 
     for f,d in files_destinations:
-        directory = '/' + '/'.join(d.split('/')[:-1])
+        directory = '/'.join(d.split('/')[:-1])
 
         if directory not in all_directories:
             all_directories.add(directory)
