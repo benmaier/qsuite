@@ -318,7 +318,7 @@ def main():
                 else:
                     get_all =  len(args)>1 and args[1] in ["all","allresults"]
 
-                    pattern_res = re.compile(r'result.*\.p$')
+                    pattern_res = re.compile(r'result.*\.p*$')
                     pattern_tim = re.compile(r'time.*\.p$')
                     resultstring = ssh_command(ssh,"ls "+cf.resultpath)
                     resultstring = resultstring.replace("\n"," ")
