@@ -14,7 +14,7 @@ $ sudo python setup.py install
 First, do 
 
 ```
-$ sudo python setup.py install
+$ sudo python setup.py install  #or
 $ sudo python3 setup.py install
 ```
 
