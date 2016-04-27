@@ -15,12 +15,17 @@ First, do
 
 ```
 $ sudo python setup.py install
+$ sudo python3 setup.py install
 ```
 
 If you're not running a virtualenv python, make sure you add
 
 ```
 export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin:$PATH
+export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/3.5/bin:$PATH
+export PATH=/Library/Frameworks/Python.framework/Versions/3.5/bin:$PATH
+export PATH=/Library/Frameworks/Python.framework/Versions/2.7/bin:$PATH
 ```
 
 to the file `~/.bash_profile` and do `$ source ~/.bash_profile`

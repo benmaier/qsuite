@@ -8,6 +8,7 @@ setup(name='qsuite',
       author_email='benjaminfrankmaier@gmail.com',
       license='MIT',
       packages=['qsuite'],
+      include_package_data = True,
       install_requires=[
           'numpy',
           'paramiko',

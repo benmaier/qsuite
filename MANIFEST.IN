@@ -1,4 +1,4 @@
 include README.md
-include qsuite/templates/* 
-include qsuite/jobscripts/* 
-include qsuite/queuesys/* 
+reverse-include ./qsuite/templates/* 
+reverse-include ./qsuite/jobscripts/* 
+reverse-include ./qsuite/queuesys/* 
