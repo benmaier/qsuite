@@ -16,4 +16,4 @@ from .qsuiteparse import *
 from .ssh import *
 from .submitjob import *
 from .printparams import *
-import queuesys
+import qsuite.queuesys as queuesys

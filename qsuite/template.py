@@ -5,6 +5,14 @@ import sys
 import qsuite
 from qsuite import rm
 
+if sys.version_info[0] == 2:
+    pass
+elif sys.version_info[0] == 3:
+    raw_input = input
+else:
+    print("Python version",sys.version_info[0],"not supported")
+    sys.exit(1)
+
 def mkdirp_customdir():
     if not os.path.exists(qsuite.customdir):
         os.makedirs(qsuite.customdir)

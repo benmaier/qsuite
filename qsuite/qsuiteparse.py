@@ -98,4 +98,4 @@ def rm_in_qsuite(qsuiteparser,qsuitefile,things_to_rm):
         write_qsuite(qsuiteparser,qsuitefile)
 
 def write_qsuite(qsuiteparser,qsuitefile):
-    qsuiteparser.write(open(qsuitefile,'wb'))
+    qsuiteparser.write(open(qsuitefile,'w'))
