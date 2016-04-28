@@ -33,7 +33,53 @@ def print_status(cf,ssh):
 
     #for each parameter combination, add job id (j) in the beginning and arrayjob id in the end
     progresses = _get_progress(cf,ssh)
-    prog = [ [j+1]+p for j,p in enumerate(progresses) ]
+    prog = []
+
+    record_waiting_id = False
+    record_done_id = False
+
+
+    # go through the progresses and clump together all 'waitings' and 'dones'
+    j = 0
+    while j<len(progresses):
+
+        # while there's normal entries, count up and add them to output
+        while j<len(progresses) and progresses[j][0]!='waiting...' and progresses[j][-1]!="done":
+            prog.append( [j+1] + progresses[j] )
+            j += 1
+
+        # start clumping 'waitings'
+        if j<len(progresses) and progresses[j][0]=='waiting...':
+
+            old_id = j+1
+
+            while j<len(progresses) and progresses[j][0]=='waiting...':
+                j += 1
+
+            if old_id==j:
+                prog.append( [ old_id ] + progresses[old_id])
+                if j<len(progresses):
+                    prog.append( [ j+1 ] + progresses[j])
+            else:
+                prog.append( [ str(old_id)+"-"+str(j+1) ] + progresses[j-1])
+
+        # start clumping 'dones'
+        if j<len(progresses) and progresses[j][-1]=='done':
+
+            old_id = j+1
+
+            while j<len(progresses) and progresses[j][-1]=='done':
+                j += 1
+
+            if old_id==j:
+                prog.append( [ old_id ] + progresses[old_id])
+                if j<len(progresses):
+                    prog.append( [ j+1 ] + progresses[j])
+            else:
+                prog.append( [ str(old_id)+"-"+str(j+1) ] + progresses[j-1])
+
+
+    #prog = [ [j+1]+p for j,p in enumerate(progresses) ]
 
     names = [ "Array ID", "Progress", "Rem. Time" ]
 
