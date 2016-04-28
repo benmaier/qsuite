@@ -150,14 +150,20 @@ def main():
                 print("Unknown option",args[1])
                 sys.exit(1)
     elif not os.path.exists(os.path.join(cwd,".qsuite")):
-        #if there's no ".qsuite" file yet, stop operating
-        print("Not initialized yet!")
-        sys.exit(1)
+        if (    (cmd not in set_cmds) \
+             or (len(args)<2) \
+             or (not args[1].startswith("default")) ):
+          
+            #if there's no ".qsuite" file yet, stop operating
+            print("Not initialized yet!")
+            sys.exit(1)
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
                  set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
                  get_cmds + test_cmds + param_cmds + qstatus_cmds):
 
-        qsuiteparser = get_qsuite(qsuitefile)
+        #I do this to prevent that the default stuff can only be set in an initialized dir
+        if not (cmd in set_cmds and len(args)>1 and args[1].startswith("default")):
+            qsuiteparser = get_qsuite(qsuitefile)
 
         if cmd in set_cmds:
             if len(args)>2:
