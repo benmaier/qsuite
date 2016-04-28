@@ -27,6 +27,8 @@ from qsuite.queuesys.job import job
 import shutil
 import re
 
+if sys.version_info[0] == 3:
+    raw_input = input
 
 def update_git(cf,ssh):
     repos = cf.git_repos
