@@ -61,7 +61,7 @@ def print_status(cf,ssh):
                 if j<len(progresses):
                     prog.append( [ j+1 ] + progresses[j])
             else:
-                prog.append( [ str(old_id)+"-"+str(j+1) ] + progresses[j-1])
+                prog.append( [ str(old_id)+"-"+str(j) ] + progresses[j-1])
 
         # start clumping 'dones'
         if j<len(progresses) and progresses[j][-1]=='done':
@@ -76,7 +76,7 @@ def print_status(cf,ssh):
                 if j<len(progresses):
                     prog.append( [ j+1 ] + progresses[j])
             else:
-                prog.append( [ str(old_id)+"-"+str(j+1) ] + progresses[j-1])
+                prog.append( [ str(old_id)+"-"+str(j) ] + progresses[j-1])
 
 
     #prog = [ [j+1]+p for j,p in enumerate(progresses) ]
