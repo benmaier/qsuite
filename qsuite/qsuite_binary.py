@@ -57,7 +57,7 @@ def custom_wrap_results(cf,ssh):
 
 def wrap_local(cf):
 
-    files = cf.files_to_scp.values() + cf.additional_files_to_scp
+    files = list(cf.files_to_scp.values()) + cf.additional_files_to_scp
     mkdirp(cf.localpath)
     for f in files:
         shutil.copy2(f,cf.localpath)
