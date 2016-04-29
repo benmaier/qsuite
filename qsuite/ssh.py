@@ -23,7 +23,7 @@ def ssh_command(ssh,command,noprint=False):
             rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
             if len(rl) > 0:
         # Print data from stdout
-                recv = stdout.channel.recv(1024)
+                recv = stdout.channel.recv(1024).decode('ascii')
                 lines = recv.split('\n')
                 if len(lines)>1:
                     first_lines = '\n'.join(lines[:-1]) + '\n'
@@ -40,7 +40,7 @@ def ssh_command(ssh,command,noprint=False):
         rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
         if len(rl) > 0:
             # Print data from stdout
-            recv = stdout.channel.recv(1024)
+            recv = stdout.channel.recv(1024).decode('ascii')
             lines = recv.split('\n')
             if len(lines)>1:
                 first_lines = '\n'.join(lines[:-1]) + '\n'
@@ -59,7 +59,7 @@ def ssh_command(ssh,command,noprint=False):
             sys.stdout.write(last_line+"\n")
         complete_received += last_line+"\n"
 
-    err = '\n'.join(stderr.read().split('\n')[:-1])
+    err = '\n'.join(stderr.read().decode('ascii').split('\n')[:-1])
     if err != '' and not noprint:
         print(err)
 
