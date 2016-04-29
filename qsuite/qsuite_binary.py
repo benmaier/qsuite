@@ -33,7 +33,7 @@ if sys.version_info[0] == 3:
 def update_git(cf,ssh):
     repos = cf.git_repos
 
-    ssh.connect(cf.server)
+    #ssh.connect(cf.server,username=cf.username)
     repostring = ''
     for repo in cf.git_repos:
 
