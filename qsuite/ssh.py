@@ -59,7 +59,7 @@ def ssh_command(ssh,command,noprint=False):
             sys.stdout.write(last_line+"\n")
         complete_received += last_line+"\n"
 
-    err = '\n'.join(stderr.read().decode('ascii').split('\n')[:-1])
+    err = '\n'.join(stderr.read().decode('utf-8').split('\n')[:-1])
     if err != '' and not noprint:
         print(err)
 

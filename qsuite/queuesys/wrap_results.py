@@ -26,7 +26,7 @@ try:
     #wrap results of the simulations
     for j in range(cf.jmax+1):
         #get coords in list space from linear index
-        if len(pcoords) > 0:
+        if len(pdims) > 0:
             pcoords = [ [c] for c in list(unravel_index(j, pdims))]
         else:
             pcoords = []
@@ -37,7 +37,7 @@ try:
             #print res
             
         for i in range(len(time)):
-            if len(icoords) > 0:
+            if len(pdims) > 0:
                 icoords = [ [c] for c in list(unravel_index(i, idims)) ]
             else:
                 icoords = []
