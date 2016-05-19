@@ -38,8 +38,6 @@ def print_status(cf,ssh):
     record_waiting_id = False
     record_done_id = False
 
-    print(progresses)
-
     # go through the progresses and clump together all 'waitings' and 'dones'
     j = 0
     while j<len(progresses):
