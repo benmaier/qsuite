@@ -195,7 +195,7 @@ Alternatively `$ qsuite start`. This will create a local directory `results_${na
 
 ### Error handling
 
-Putting errors in code is each scientist's favorite hobby. Hence, `qsuite` catches occuring errors and writes them into progress files, s.t. you can see the job is not running anymore by typing `qstat stat`. However, often you want to explicitly see the errors. Hence, you can use
+Putting errors in code is each scientist's favorite hobby. Hence, `qsuite` catches occuring errors and writes them into progress files, s.t. you can see the job is not running anymore by typing `qsuite stat`. However, often you want to explicitly see the errors. Hence, you can use
 
 ```bash
 $ qsuite err ARRAY_ID
@@ -217,8 +217,8 @@ Once the job is finished, do
 $ qsuite wrap
 ```
 
-The results are now stored in `${serverpath}/results/results.p` and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`. 
-Beware! Pickled files will be compressed with the `gzip` module. Load them with `import pickle; import gzip; pickle.load(gzip.open('filename','rb'))`.
+The results are now stored in `${serverpath}/results/results.p.gz` and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`. 
+Beware! The result file will be compressed with the `gzip` format.
 
 ### Customized wrapping
 
