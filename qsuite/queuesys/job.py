@@ -2,6 +2,8 @@ from __future__ import print_function
 import sys
 import time
 import os
+import traceback
+
 from numpy import mean
 from numpy import std
 from numpy import sqrt
@@ -148,7 +150,8 @@ def job(j,resultpath=None,cf=None):
                 with open(cf.serverpath+"/output/progress_%d" % j,"w") as progressfile:
                     progressfile.write("error: "+e.__class__.__name__+"\n")
 
-            raise e 
+            traceback.print_exc(file=sys.stderr)
+            sys.exit(1) 
 
         t_end = time.time()
         
