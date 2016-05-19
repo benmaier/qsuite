@@ -4,19 +4,43 @@ Provides a general framework to submit array jobs on an SGE (Sun Grid Engine) or
 
 ## Install
 
-### Linux
+In order for `qsuite` to function properly, you have to implement an automatic login to your compute cluster. Say your username there is `quser` and the cluster address is `qclust`. On your local machine, your username is `localuser`.
 
-```
-$ sudo python setup.py install
+The following is adapted from http://www.linuxproblem.org/art_9.html . The first you have to do is to generate a pair of RSA authentication keys
+
+```bash
+localuser$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/a/.ssh/id_rsa): 
+Created directory '/home/a/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/a/.ssh/id_rsa.
+Your public key has been saved in /home/a/.ssh/id_rsa.pub.
+The key fingerprint is:
+ab:cd:1e:4e quser@qclust
 ```
 
-### Mac OSX
-First, do 
+Now create an `.ssh` directory on the remote machine
+
+```bash
+localuser$ ssh quser@qclust mkdir -p ~/.ssh
+```
+
+and append your public key from your lcoal machine to the authorized key file on the cluster
+
+```bash
+localuser$ cat ~/.ssh/id_rsa.pub | ssh quser@qclust 'cat >> ~/.ssh/authorized_keys'
+```
+
+### Linux, Mac OSX
 
 ```
 $ sudo python setup.py install  #or
 $ sudo python3 setup.py install
 ```
+
+### Additional Mac OSX
 
 If you're not running a virtualenv python, make sure you add
 
@@ -228,7 +252,7 @@ Often you don't want all of the results, but a prepared version so you don't hav
 $ qsuite init customwrap
 ```
 
-This copies the template to your working directory and will scp it to the server directory when you submit the job. In cas you already have a customwrap-file, you can add it as
+This copies the template to your working directory and will scp it to the server directory when you submit the job. In case you already have a customwrap-file, you can add it as
 
 ```bash
 $ qsuite set customwrap <filename>
