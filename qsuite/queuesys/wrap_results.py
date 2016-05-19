@@ -37,7 +37,7 @@ try:
             #print res
             
         for i in range(len(time)):
-            if len(pdims) > 0:
+            if len(idims) > 0:
                 icoords = [ [c] for c in list(unravel_index(i, idims)) ]
             else:
                 icoords = []
