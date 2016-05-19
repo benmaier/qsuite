@@ -73,7 +73,6 @@ def _update_progress_file(progress_id, N_id, times, filename, bar_length=40):
     text = "[{0}] {1}%__{2}\n".format("="*block + " "*(bar_length-block),
                                      round(progress, 3)*100, timeleft)
 
-    print(text)
     progressfile = open(filename,"w")
     progressfile.write(text)
     progressfile.close()
@@ -140,8 +139,16 @@ def job(j,resultpath=None,cf=None):
         
         t_start = time.time()
 
-        #start the simulation and save the result
-        results[ip] = simcode.simulation_code(kwargs)
+        try:
+            # start the simulation and save the result
+            results[ip] = simcode.simulation_code(kwargs)
+        except Exception as e:
+            # in case there's an error, write that into the progress file
+            if not is_local:
+                with open(cf.serverpath+"/output/progress_%d" % j,"w") as progressfile:
+                    progressfile.write("error: "+e.__class__.__name__+"\n")
+
+            raise e 
 
         t_end = time.time()
         

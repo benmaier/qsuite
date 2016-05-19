@@ -129,6 +129,7 @@ def main():
     customwrap_cmds = ["customwrap"]
     get_cmds = ["get"]
     test_cmds = ["test"]
+    err_cmds = ["err","error"]
     param_cmds = ["params"]
 
     if cmd in ["init","initialize"]:
@@ -159,7 +160,7 @@ def main():
             sys.exit(1)
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
                  set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
-                 get_cmds + test_cmds + param_cmds + qstatus_cmds):
+                 get_cmds + test_cmds + param_cmds + qstatus_cmds + err_cmds):
 
         #I do this to prevent that the default stuff can only be set in an initialized dir
         if not (cmd in set_cmds and len(args)>1 and args[1].startswith("default")):
@@ -269,7 +270,7 @@ def main():
             print_params(cf)
 
         elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\
-                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + qstatus_cmds:
+                    ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + qstatus_cmds + err_cmds:
 
             cf = qconfig(qsuiteparser=qsuiteparser)
             ssh = ssh_connect(cf)
@@ -306,6 +307,15 @@ def main():
                     print_params_and_status(cf,ssh)
                 else:
                     print_status(cf,ssh)
+                sys.exit(0)
+            elif cmd in err_cmds:
+                cmds = args[1:]
+                if len(cmds)>0:
+                    array_id = str(int(cmds[0]))
+                else:
+                    array_id = "1"
+                print("Using array ID "+array_id+". Beware! Array IDs start counting at 1.")
+                ssh_command(ssh,"cat "+cf.serverpath+"/output/"+cf.basename+".sh.e$(cat "+cf.serverpath+"/.jobid)."+array_id)
                 sys.exit(0)
             elif cmd in ssh_cmds:
                 cmds = args[1:]

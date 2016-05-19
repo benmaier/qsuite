@@ -193,6 +193,23 @@ Alternatively `$ qsuite start`. This will create a local directory `results_${na
 
 ## Basic functions
 
+### Error handling
+
+Putting errors in code is each scientist's favorite hobby. Hence, `qsuite` catches occuring errors and writes them into progress files, s.t. you can see the job is not running anymore by typing `qstat stat`. However, often you want to explicitly see the errors. Hence, you can use
+
+```bash
+$ qsuite err ARRAY_ID
+```
+
+where `ARRAY_ID` is the job number for which you want to see the error (starts counting at 1). 
+This is the number which is left from the progress bar when you call `qsuite stat`. If everything failed, you can just do
+
+```bash
+$ qsuite err
+```
+
+and `qsuite` automatically assumes that you mean the job with array ID 1.
+
 ### Wrap the results
 Once the job is finished, do
 
@@ -324,11 +341,25 @@ $ qsuite reset defaultcustomwrap
 
 ### Checking the job status
 
+The following gives you a fancy output with a progress bar and an estimated time remaining.
+
+```bash
+$ qsuite stat
+```
+Sometimes, it's helpful to see which parameters a certain job has in order to figure out why it's running so slowly. Do
+
+```bash
+$ qsuite stat p
+```
+
+The following gives you the standard queue output.
+
 ```bash
 $ qsuite qstat      #shows all jobs of the user 
 $ qsuite qstat all  #shows the whole queue
 $ qsuite qstat job  #shows the status of the current job
 ```
+
 
 Alternatives to `qstat` are `stat` and `status`.
 
