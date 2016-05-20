@@ -49,6 +49,7 @@ def update_git(cf,ssh):
 def wrap_results(cf,ssh):
     ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " wrap_results.py;")
     ssh_command(ssh, "cd " + cf.serverpath + "/results; gzip results.p" )
+    ssh_command(ssh, "cd " + cf.serverpath + "/results; gzip times.p" )
     custom_wrap_results(cf,ssh)
 
 def custom_wrap_results(cf,ssh):
@@ -337,7 +338,7 @@ def main():
                     get_all =  len(args)>1 and args[1] in ["all","allresults"]
 
                     pattern_res = re.compile(r'result.*\.p*$')
-                    pattern_tim = re.compile(r'time.*\.p$')
+                    pattern_tim = re.compile(r'time.*\.p*$')
                     resultstring = ssh_command(ssh,"ls "+cf.resultpath)
                     resultstring = resultstring.replace("\n"," ")
                     resultlist = [ f for f in resultstring.split(" ") if (f!="" and not f.startswith(".")) ]
