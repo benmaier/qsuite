@@ -11,12 +11,12 @@ The following is adapted from http://www.linuxproblem.org/art_9.html . The first
 ```bash
 localuser$ ssh-keygen -t rsa
 Generating public/private rsa key pair.
-Enter file in which to save the key (/home/a/.ssh/id_rsa): 
-Created directory '/home/a/.ssh'.
+Enter file in which to save the key (/home/localuser/.ssh/id_rsa): 
+Created directory '/home/localuser/.ssh'.
 Enter passphrase (empty for no passphrase): 
 Enter same passphrase again: 
-Your identification has been saved in /home/a/.ssh/id_rsa.
-Your public key has been saved in /home/a/.ssh/id_rsa.pub.
+Your identification has been saved in /home/localuser/.ssh/id_rsa.
+Your public key has been saved in /home/localuser/.ssh/id_rsa.pub.
 The key fingerprint is:
 ab:cd:1e:4e quser@qclust
 ```
