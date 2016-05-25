@@ -286,10 +286,21 @@ def main():
                 wrap_local(cf)
                 sys.exit(0)
             elif cmd in submit_cmds:
-                update_git(cf,ssh)
-                make_job_ready(cf,ssh)
-                wrap_local(cf)
-                start_job(cf,ssh)
+                cmds = args[1:]
+                if len(cmds)>0:
+                    array_id = int(cmds[0])
+                    print("Using array ID "+str(array_id)+". Beware! Array IDs start counting at 1.")
+                else:
+                    array_id = None
+                    update_git(cf,ssh)
+
+                make_job_ready(cf,ssh,array_id)
+                
+                if array_id is None:
+                    wrap_local(cf)
+
+                start_job(cf,ssh,array_id)
+
                 sys.exit(0)
             elif cmd in wrap_cmds:
                 wrap_results(cf,ssh)

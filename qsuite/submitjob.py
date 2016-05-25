@@ -12,20 +12,28 @@ def get_dummy(qname):
 
     return s
 
-def get_jobscript(cf):
+def get_jobscript(cf,array_id=None):
     JOBSCRIPT = get_dummy(cf.queue)
+
+    if array_id is None:
+        arr_id_min = cf.jmin+1
+        arr_id_max = cf.jmax+1
+    else:
+        arr_id_min = array_id
+        arr_id_max = array_id
 
     jobscript = JOBSCRIPT % (\
                 cf.shell,
                 cf.memory,
-                cf.jmin+1,
-                cf.jmax+1,
+                arr_id_min,
+                arr_id_max,
                 cf.serverpath+"/output",
                 cf.serverpath+"/output",
                 cf.priority,
                 cf.pythonpath,
                 cf.serverpath,
                 )
+
     return jobscript
 
 def get_file_list(cf):
@@ -53,9 +61,9 @@ def get_file_list(cf):
 
     return files_destinations
 
-def make_job_ready(cf,ssh):
+def make_job_ready(cf,ssh,array_id=None):
 
-    jobscript = get_jobscript(cf)
+    jobscript = get_jobscript(cf,array_id)
     print("\nUsing jobscript:\n================")    
     print(jobscript)
 
@@ -81,7 +89,7 @@ def make_job_ready(cf,ssh):
         ssh_command(ssh,"cd " +cf.serverpath+"; ./execute_after_scp.sh;")
 
 
-def start_job(cf,ssh):
+def start_job(cf,ssh,array_id=None):
     """taken from https://github.com/osg-bosco/BLAH/blob/1d217fad9c6b54a5e543f7a9d050e77047be0bb1/src/scripts/pbs_submit.sh#L193"""
     if cf.queue=="SGE":
         ssh_command(ssh,"cd " +cf.serverpath+";\
@@ -98,6 +106,9 @@ def start_job(cf,ssh):
 
     N = len(cf.parameter_list)-1
     filepath = cf.serverpath + "/output/progress_"
-    cmd = ('for i in `seq 0 %d`; do echo " " > '+filepath+'$i; done;') % N
+    if array_id is None:
+        cmd = ('for i in `seq 0 %d`; do echo " " > '+filepath+'$i; done;') % N
+    else:
+        cmd = ('for i in `seq %d %d`; do echo " " > '+filepath+'$i; done;') % (int(array_id)-1,int(array_id)-1)
     ssh_command(ssh,cmd)
     
