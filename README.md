@@ -215,6 +215,14 @@ $ qsuite submit
 
 Alternatively `$ qsuite start`. This will create a local directory `results_${name}` where all your relevant files will be copied to. It then copies all relevant files to the queueing system and submits the job.  
 
+In case something went wrong in a job and it crashed or you deleted it, you can resubmit that job using
+
+```bash
+$ qsuite submit $ARRAY_ID
+```
+
+where `$ARRAY_ID` is the job number for which you want to restart the calculation. Note that the job must have been submitted before. 
+
 ## Basic functions
 
 ### Error handling
@@ -222,10 +230,10 @@ Alternatively `$ qsuite start`. This will create a local directory `results_${na
 Putting errors in code is each scientist's favorite hobby. Hence, `qsuite` catches occuring errors and writes them into progress files, s.t. you can see the job is not running anymore by typing `qsuite stat`. However, often you want to explicitly see the errors. Hence, you can use
 
 ```bash
-$ qsuite err ARRAY_ID
+$ qsuite err $ARRAY_ID
 ```
 
-where `ARRAY_ID` is the job number for which you want to see the error (starts counting at 1). 
+where `$ARRAY_ID` is the job number for which you want to see the error (starts counting at 1). 
 This is the number which is left from the progress bar when you call `qsuite stat`. If everything failed, you can just do
 
 ```bash
