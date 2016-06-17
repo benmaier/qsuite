@@ -63,23 +63,38 @@ def get_file_list(cf):
 
 def make_job_ready(cf,ssh,array_id=None):
 
-    jobscript = get_jobscript(cf,array_id)
-    print("\nUsing jobscript:\n================")    
-    print(jobscript)
-
-    joblocalname = os.path.join(os.getcwd(),"."+cf.basename+".sh")
-    jobservername = cf.serverpath+"/"+cf.basename+".sh"
-
-    f = open(joblocalname,'w')
-    f.write(jobscript)
-    f.close()
-
     files_destinations = get_file_list(cf)
-    files_destinations += [ (joblocalname, jobservername) ]
+    joblocal_names = []
+
+    if type(array_id) is not list and type(array_id) is not tuple:
+        is_list = True
+        array_id = [ array_id ]
+    else:
+        is_list = False
+
+    for a_id in array_id:
+        jobscript = get_jobscript(cf,a_id)
+        print("\nUsing jobscript:\n================")    
+        print(jobscript)
+
+        if a_id is not None:
+            joblocalname = os.path.join(os.getcwd(),"."+cf.basename+"_%d.sh" % (a_id))
+            jobservername = cf.serverpath+"/"+cf.basename+"_%d.sh" %(a_id)
+        else:
+            joblocalname = os.path.join(os.getcwd(),"."+cf.basename+".sh")
+            jobservername = cf.serverpath+"/"+cf.basename+".sh"
+
+        f = open(joblocalname,'w')
+        f.write(jobscript)
+        f.close()
+
+        files_destinations += [ (joblocalname, jobservername) ]
+        joblocal_names.append(joblocalname)
 
     sftp_put_files(ssh,cf,files_destinations)
-
-    qsuite.rm(joblocalname)
+    
+    for joblocalname in joblocal_names:
+        qsuite.rm(joblocalname)
 
     files_chmod_x = [ "chmod +x "+f[1]+"; " for f in files_destinations if f[1].endswith(".sh") ]
 
@@ -90,25 +105,35 @@ def make_job_ready(cf,ssh,array_id=None):
 
 
 def start_job(cf,ssh,array_id=None):
-    """taken from https://github.com/osg-bosco/BLAH/blob/1d217fad9c6b54a5e543f7a9d050e77047be0bb1/src/scripts/pbs_submit.sh#L193"""
-    if cf.queue=="SGE":
-        ssh_command(ssh,"cd " +cf.serverpath+";\
-                         jobID=`qsub " + cf.basename + ".sh`;\
-                         jobID=`echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`;\
-                         echo $jobID > .jobid;")
-    elif cf.queue=="PBS":
-        ssh_command(ssh,"cd " +cf.serverpath+";\
-                         jobID=`qsub " + cf.basename + ".sh`;\
-                         echo $jobID > .jobid;")
+    """job id procedure taken from https://github.com/osg-bosco/BLAH/blob/1d217fad9c6b54a5e543f7a9d050e77047be0bb1/src/scripts/pbs_submit.sh#L193"""
+    if type(array_id) is list or type(array_id) is tuple:
+        suffices = ["_%d.sh" % a_id for a_id in array_id]
     else:
-        print("Unknown queue:",cf.queue)
-        sys.exit(1)
+        suffices = [".sh"]
+        
+    for suffix in suffices:
+        if cf.queue=="SGE":
+            ssh_command(ssh,"cd " +cf.serverpath+";\
+                             jobID=`qsub " + cf.basename + suffix +"`;\
+                             jobID=`echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`;\
+                             echo $jobID > .jobid;")
+        elif cf.queue=="PBS":
+            ssh_command(ssh,"cd " +cf.serverpath+";\
+                             jobID=`qsub " + cf.basename + suffix +"`;\
+                             echo $jobID > .jobid;")
+        else:
+            print("Unknown queue:",cf.queue)
+            sys.exit(1)
 
     N = len(cf.parameter_list)-1
     filepath = cf.serverpath + "/output/progress_"
     if array_id is None:
         cmd = ('for i in `seq 0 %d`; do echo " " > '+filepath+'$i; done;') % N
+    elif type(array_id) is list or type(array_id) is tuple:
+        cmd = ""
+        for a_id in array_id:
+            cmd += (' echo " " > '+filepath+'%d; done;') % (int(a_id)-1)
     else:
-        cmd = ('for i in `seq %d %d`; do echo " " > '+filepath+'$i; done;') % (int(array_id)-1,int(array_id)-1)
+        cmd = ('echo " " > '+filepath+'%d; done;') % (int(array_id)-1)
     ssh_command(ssh,cmd)
     

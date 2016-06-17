@@ -288,8 +288,8 @@ def main():
             elif cmd in submit_cmds:
                 cmds = args[1:]
                 if len(cmds)>0:
-                    array_id = int(cmds[0])
-                    print("Using array ID "+str(array_id)+". Beware! Array IDs start counting at 1.")
+                    array_id = [int(c) for c in cmds]
+                    print("Using array IDs "+str(array_id)+". Beware! Array IDs start counting at 1.")
                 else:
                     array_id = None
                     update_git(cf,ssh)

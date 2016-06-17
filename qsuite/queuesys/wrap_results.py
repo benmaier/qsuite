@@ -22,20 +22,30 @@ idims = [ len(p[1]) for p in cf.internal_parameters ]
 results = empty(pdims+idims,dtype=object).flatten()
 times = empty(pdims+idims,dtype=object).flatten()
 
-try:
-    #wrap results of the simulations
-    for j in range(cf.jmax+1):
-        #get coords in list space from linear index
-        if len(pdims) > 0:
-            pcoords = [ [c] for c in list(unravel_index(j, pdims))]
-        else:
-            pcoords = []
+#wrap results of the simulations
+loading_successful = True
+missing_array_ids = []
+for j in range(cf.jmax+1):
+    #get coords in list space from linear index
+    if len(pdims) > 0:
+        pcoords = [ [c] for c in list(unravel_index(j, pdims))]
+    else:
+        pcoords = []
 
+    try:
         time = pickle.load(open(cf.resultpath+"/times_%d.p" % j,'rb'))
         if not cf.only_save_times:
             res = pickle.load(open(cf.resultpath+"/results_%d.p" % j,'rb'))
             #print res
+    except Exception as e:
+        if loading_successful:
+            print("*** Caught Exception: Files missing! Jobs with the following ARRAY IDs did not produce results:")
+        missing_array_ids.append(j+1)
+        #print("*** Caught exception: %s,%s" % (e.__class__,e))
+        loading_successful = False
+
             
+    if loading_successful:
         for i in range(len(time)):
             if len(idims) > 0:
                 icoords = [ [c] for c in list(unravel_index(i, idims)) ]
@@ -45,29 +55,27 @@ try:
             times[flat_index] = time[i]
             if not cf.only_save_times:
                 results[flat_index] = res[i]
-except Exception as e:
-    print("*** Caught exception: %s,%s" % (e.__class__,e))
-    print("couldn't load all files")
+
+if loading_successful:
+    # convert to lists for better portability
+    times = times.reshape(pdims+idims).tolist()
+    results = results.reshape(pdims+idims).tolist()
+
+    try:
+        #save the wrapped data
+        pickle.dump(times,open(cf.resultpath+"/times.p",'wb'))
+        if not cf.only_save_times:
+            pickle.dump(results,open(cf.resultpath+"/results.p",'wb'))
+    except:
+        print("couldn't write files")
+        sys.exit(1)
+
+        
+    # delete the original files    
+    for j in range(cf.jmax+1):
+        os.remove(cf.resultpath+"/times_%d.p" % j)
+        if not cf.only_save_times:
+            os.remove(cf.resultpath+"/results_%d.p" % j)
+else: 
+    print(' '.join([ str(d) for d in missing_array_ids ]))
     sys.exit(1)
-
-
-#convert to lists for better portability
-times = times.reshape(pdims+idims).tolist()
-results = results.reshape(pdims+idims).tolist()
-
-try:
-    #save the wrapped data
-    pickle.dump(times,open(cf.resultpath+"/times.p",'wb'))
-    if not cf.only_save_times:
-        pickle.dump(results,open(cf.resultpath+"/results.p",'wb'))
-except:
-    print("couldn't write files")
-    sys.exit(1)
-
-    
-#delete the original files    
-for j in range(cf.jmax+1):
-    os.remove(cf.resultpath+"/times_%d.p" % j)
-    if not cf.only_save_times:
-        os.remove(cf.resultpath+"/results_%d.p" % j)
-    
