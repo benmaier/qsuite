@@ -22,9 +22,18 @@ def _get_progress(cf,ssh):
     N = len(cf.parameter_list)-1
     filepath = cf.serverpath + "/output/progress_"
     cmd = ('for i in `seq 0 %d`; do cat '+filepath+'$i; done;') % N
-    progresses = ssh_command(ssh,cmd,noprint=True)
-    progresses = progresses.split("\n")[:-1]
-    progresses = [ p.split("__") if len(p)>1 else ['waiting...',''] for p in progresses ]
+    progresses_ = ssh_command(ssh,cmd,noprint=True)
+    progresses_ = progresses_.split("\n")[:-1]
+    progresses = []
+    for p in progresses_:
+        if len(p)>1:
+            text_and_time = p.split("__")
+            if len(text_and_time)==1:
+                text_and_time.append("")
+        else:
+            text_and_time = ['waiting...','']
+
+        progresses.append(text_and_time)
 
     return progresses
 
