@@ -221,8 +221,12 @@ In case something went wrong in a job and it crashed or you deleted it, you can 
 $ qsuite submit $ARRAY_ID
 ```
 
-where `$ARRAY_ID` is the job number for which you want to restart the calculation. Note that the job must have been submitted before. 
+where `$ARRAY_ID` is the job number for which you want to restart the calculation. Note that the job must have been submitted before. You can also submit ranges of array IDs and multiple array IDs, e.g.
+```bash
+$ qsuite submit 1 65 578-1000 3
+```
 
+where `$ARRAY_ID` is the job number for which you want to restart the calculation. Note that the job must have been submitted before. 
 ## Basic functions
 
 ### Error handling
