@@ -288,7 +288,7 @@ def main():
             elif cmd in submit_cmds:
                 cmds = args[1:]
                 if len(cmds)>0:
-                    array_id = [int(c) for c in cmds]
+                    array_id = [ int(c) if ("-" not in c) else [ int(rangeid) for rangeid in c.split("-") ] for c in cmds]
                     print("Using array IDs "+str(array_id)+". Beware! Array IDs start counting at 1.")
                 else:
                     array_id = None

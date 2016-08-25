@@ -18,6 +18,9 @@ def get_jobscript(cf,array_id=None):
     if array_id is None:
         arr_id_min = cf.jmin+1
         arr_id_max = cf.jmax+1
+    elif type(array_id) in [ list, tuple ] and len(array_id)==2 :
+        arr_id_min = array_id[0]
+        arr_id_max = array_id[1]
     else:
         arr_id_min = array_id
         arr_id_max = array_id
@@ -77,9 +80,12 @@ def make_job_ready(cf,ssh,array_id=None):
         print("\nUsing jobscript:\n================")    
         print(jobscript)
 
-        if a_id is not None:
+        if a_id is not None and (type(a_id) not in [ tuple, list ]):
             joblocalname = os.path.join(os.getcwd(),"."+cf.basename+"_%d.sh" % (a_id))
             jobservername = cf.serverpath+"/"+cf.basename+"_%d.sh" %(a_id)
+        elif (type(a_id) in [ tuple, list ]):
+            joblocalname = os.path.join(os.getcwd(),"."+cf.basename+"_%d_%d.sh" % tuple(a_id))
+            jobservername = cf.serverpath+"/"+cf.basename+"_%d_%d.sh" % tuple(a_id)
         else:
             joblocalname = os.path.join(os.getcwd(),"."+cf.basename+".sh")
             jobservername = cf.serverpath+"/"+cf.basename+".sh"
@@ -107,7 +113,7 @@ def make_job_ready(cf,ssh,array_id=None):
 def start_job(cf,ssh,array_id=None):
     """job id procedure taken from https://github.com/osg-bosco/BLAH/blob/1d217fad9c6b54a5e543f7a9d050e77047be0bb1/src/scripts/pbs_submit.sh#L193"""
     if type(array_id) is list or type(array_id) is tuple:
-        suffices = ["_%d.sh" % a_id for a_id in array_id]
+        suffices = ["_%d.sh" % a_id if type(a_id) in [ int ] else "_%d_%d.sh" % tuple(a_id) for a_id in array_id]
     else:
         suffices = [".sh"]
         
@@ -132,7 +138,10 @@ def start_job(cf,ssh,array_id=None):
     elif type(array_id) is list or type(array_id) is tuple:
         cmd = ""
         for a_id in array_id:
-            cmd += (' echo " " > '+filepath+'%d; done;') % (int(a_id)-1)
+            if type(a_id) in [ tuple, list ]:
+                cmd += (' for i in `seq %d %d`; do echo " " > '+filepath+'$i; done;') % tuple(a_id)
+            else:
+                cmd += (' echo " " > '+filepath+'%d; done;') % (int(a_id)-1)
     else:
         cmd = ('echo " " > '+filepath+'%d; done;') % (int(array_id)-1)
     ssh_command(ssh,cmd)
