@@ -6,7 +6,7 @@ Provides a general framework to submit array jobs on an SGE (Sun Grid Engine) or
 
 In order for `qsuite` to function properly, you have to implement an automatic login to your compute cluster. Say your username there is `quser` and the cluster address is `qclust`. On your local machine, your username is `localuser`.
 
-The following is adapted from http://www.linuxproblem.org/art_9.html . The first you have to do is to generate a pair of RSA authentication keys
+The following is adapted from http://www.linuxproblem.org/art_9.html . The first you have to do is to generate a pair of RSA authentication keys like it's done in the following. Note that in the current version of qsuite rsa files encrypted with a passphrase are not supported, so you shouldn't add one when you're using the commands below.
 
 ```bash
 localuser$ ssh-keygen -t rsa
