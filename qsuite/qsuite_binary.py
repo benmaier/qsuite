@@ -263,6 +263,7 @@ def main():
                 respath = args[2]
 
             cf = qconfig(qsuiteparser=qsuiteparser)
+            sys.path.insert(1,os.getcwd()) #add current working directory to import paths
             job(jobid,respath,cf)
             sys.exit(0)                
 
