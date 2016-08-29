@@ -122,7 +122,7 @@ Three files appeared in your directory.
    
    Our file will look like this
    ```python
-   from brownian_motion import BrownianMotion()
+   from brownian_motion import BrownianMotion
 
    def simulation_code(kwargs):
 
