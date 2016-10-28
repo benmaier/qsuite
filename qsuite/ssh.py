@@ -81,8 +81,10 @@ def ssh_connect(cf):
         print("Authentication failed when connecting to %s" % cf.server)
         print("error:",e)
         sys.exit(1)
-    except:
+    except Exception as e:
         print("Couldn't establish an ssh connection to %s" % cf.server)
+        print("error:", e)
+        sys.exit(1)
 
     return ssh
 
