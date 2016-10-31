@@ -54,6 +54,12 @@ export PATH=/Library/Frameworks/Python.framework/Versions/2.7/bin:$PATH
 
 to the file `~/.bash_profile` and do `$ source ~/.bash_profile`
 
+Also, you may encounter a problem with the python package `cryptography`. If this is the case, try to reinstall it using 
+
+```
+LDFLAGS="-L/usr/local/opt/openssl/lib" CFLAGS="-I/usr/local/opt/openssl/include" pip install cryptography
+```
+
 ### Without root access
 
 ```
