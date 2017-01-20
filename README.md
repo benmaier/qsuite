@@ -232,6 +232,13 @@ where `$ARRAY_ID` is the job number for which you want to restart the calculatio
 $ qsuite submit 1 65 578-1000 3
 ```
 
+Sometimes you want to resubmit all jobs which had an error or all jobs which are still in "waiting..." mode (because there was an uncaught error). You can do
+```bash
+$ qsuite submit err        # submits all jobs which had a caught error
+$ qsuite submit wait       # submits all jobs which are in waiting status
+$ qsuite submit err wait   # submits all jobs which are in either of above
+```
+
 where `$ARRAY_ID` is the job number for which you want to restart the calculation. Note that the job must have been submitted before. 
 ## Basic functions
 

@@ -24,8 +24,12 @@ from qsuite import print_params
 from qsuite import print_status
 from qsuite import print_params_and_status
 from qsuite.queuesys.job import job
+from qsuite.printparams import _get_progress
 import shutil
 import re
+
+from operator import itemgetter
+from itertools import groupby
 
 if sys.version_info[0] == 3:
     raw_input = input
@@ -289,8 +293,46 @@ def main():
             elif cmd in submit_cmds:
                 cmds = args[1:]
                 if len(cmds)>0:
-                    array_id = [ int(c) if ("-" not in c) else [ int(rangeid) for rangeid in c.split("-") ] for c in cmds]
-                    print("Using array IDs "+str(array_id)+". Beware! Array IDs start counting at 1.")
+                    try:
+                        array_id = [ int(c) if ("-" not in c) else [ int(rangeid) for rangeid in c.split("-") ] for c in cmds]
+                        print("Using array IDs "+str(array_id)+". Beware! Array IDs start counting at 1.")
+                    except ValueError:
+                        if any([ "err" in c or "wait" in c for c in cmds ]):
+
+                            key_words = []
+                            if any([ "err" in c for c in cmds ]):
+                                key_words.append("ERR")
+                            if any([ "wait" in c for c in cmds ]):
+                                key_words.append("WAIT")
+
+                            print("Fetching array IDs that produced errors with keywords", " and ".join(key_words))
+                            #print(key_words)
+                            progresses = _get_progress(cf,ssh)
+                            array_id = []
+                            last_id = 0
+                            for j in range(len(cf.parameter_list)):
+                                #print(progresses[j][0].upper())
+                                if any( kw in progresses[j][-1].upper() or kw in progresses[j][0].upper() for kw in key_words ):                                    
+                                    array_id.append(j+1)
+
+                            if len(array_ids)>0:
+                                ranges = []
+                                for k, g in groupby(enumerate(array_id), lambda (i,x):i-x):
+                                    group = map(itemgetter(1), g)
+                                    if group[0]==group[-1]:
+                                        ranges.append(group[0])
+                                    else:
+                                        ranges.append((group[0], group[-1]))
+
+                                print("Found erros in jobs with Array IDs", ranges)
+                                array_id = ranges
+                            else:
+                                print("No erroneous IDs found.")
+                                sys.exit(1)
+
+                        else:
+                            print("Unknown submission command",cmds[0],". Aborting.")
+                            sys.exit(1)
                 else:
                     array_id = None
                     update_git(cf,ssh)
