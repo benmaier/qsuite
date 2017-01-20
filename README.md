@@ -294,7 +294,7 @@ You can load `./results.mean_err.npz` as
 
 ```python
 import numpy as np
-data = np.load('./results.mean_err.npz')
+data = np.load('./results_mean_err.npz')
 mean = data['mean']
 err = data['err']
 ```
