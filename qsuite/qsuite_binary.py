@@ -2,6 +2,7 @@ from __future__ import print_function
 import os
 import sys
 import qsuite
+import subprocess
 from qsuite import qconfig
 import ast
 from qsuite import get_template_file
@@ -30,6 +31,13 @@ import re
 
 from operator import itemgetter
 from itertools import groupby
+
+try:
+    # Python 2
+    import cPickle as pickle
+except ImportError:
+    # Python 3
+    import pickle
 
 if sys.version_info[0] == 3:
     raw_input = input
@@ -136,6 +144,7 @@ def main():
     test_cmds = ["test"]
     err_cmds = ["err","error"]
     param_cmds = ["params"]
+    convert_cmds = ["convert"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
@@ -155,7 +164,7 @@ def main():
             else:
                 print("Unknown option",args[1])
                 sys.exit(1)
-    elif not os.path.exists(os.path.join(cwd,".qsuite")):
+    elif not os.path.exists(os.path.join(cwd,".qsuite")) and not cmd in convert_cmds:
         if (    (cmd not in set_cmds) \
              or (len(args)<2) \
              or (not args[1].startswith("default")) ):
@@ -163,6 +172,46 @@ def main():
             #if there's no ".qsuite" file yet, stop operating
             print("Not initialized yet!")
             sys.exit(1)
+    elif cmd in convert_cmds:
+        #convert to numpy and calculate mean and error
+        #only works in results directory!
+        cf = qconfig()
+
+        cmds = args[1:]
+        if len(cmds)==0:
+            cmds = ["numpy"]
+        
+        import numpy as np
+
+        data_already_loaded = False
+
+        if "numpy" in cmds or \
+           ("meanerr" in cmds and not os.path.exists("results.npy")):
+
+            if not os.path.exists(os.path.join(cwd, "results.p")):
+                p = subprocess.Popen(["gzip", "-d", "results.p.gz"])
+                exit_code = p.wait() 
+                if exit_code == 1:
+                    print("error while using gzip -d results.p.gz")
+                    sys.exit(1)
+
+            data = pickle.load(open("results.p","rb"))
+            data = np.array(data)
+            np.save("results.npy",data)
+            data_already_loaded = True
+
+        if "meanerr" in cmds:
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            N = len((cf.external_parameters+cf.internal_parameters)[axis][1])
+            mn, err = data.mean(axis=axis), data.std(axis=axis)/np.sqrt(N)
+            np.savez("./results_mean_err.npz",mean=mn,err=err)
+
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
                  set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
                  get_cmds + test_cmds + param_cmds + qstatus_cmds + err_cmds):

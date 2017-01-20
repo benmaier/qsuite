@@ -269,6 +269,36 @@ $ qsuite wrap
 The results are now stored in `${serverpath}/results/results.p.gz` and `${serverpath}/results/times.p` and can be downloaded via `$ qsuite get all`. 
 Beware! The result file will be compressed with the `gzip` format.
 
+### Copy files from the server directory to your local working directory
+
+```bash
+$ qsuite get <filename without path> #get file from server directory
+$ qsuite get         #get customly wrapped files from server/result directory
+$ qsuite get results #get customly wrapped files from server/result directory (yes, same as $ qsuite get)
+$ qsuite get all     #get all wrapped files from server/result directory
+```
+
+Beware! Pickled files will be compressed with the `gzip` module. Load them with `import pickle; import gzip; pickle.load(gzip.open('filename','rb'))` or unzip them using `gzip -d results.p.gz`
+
+### Preprocess data locally
+
+Often enough `results.p.gz` contains a g-zipped array of floats which you need as a numpy array or as mean and error. After downloading (and without necessary unzipping), change to the result directory
+
+```bash
+$ cd results_$NAME/      # contains result.p or results.p.gz
+$ qsuite convert numpy   # unzips results.p.gz, loads, converts to numpy array, saves as `./results.npy`
+$ qsuite convert meanerr # does everything as `convert numpy` does, then looks builds mean and error over all measurements. Saves as `./results.mean_err.npz`
+```
+
+You can load `./results.mean_err.npz` as 
+
+```python
+import numpy as np
+data = np.load('./results.mean_err.npz')
+mean = data['mean']
+err = data['err']
+```
+
 ### Customized wrapping
 
 Often you don't want all of the results, but a prepared version so you don't have to download everything. To this end, there's a template file for customized wrapping. You can get this template by typing
@@ -341,17 +371,6 @@ $ qsuite set exec <filename>
 $ qsuite set cfg <filename>
 $ qsuite set sim <filename>
 ```
-
-### Copy files from the server directory to your local working directory
-
-```bash
-$ qsuite get <filename without path> #get file from server directory
-$ qsuite get         #get customly wrapped files from server/result directory
-$ qsuite get results #get customly wrapped files from server/result directory (yes, same as $ qsuite get)
-$ qsuite get all     #get all wrapped files from server/result directory
-```
-
-Beware! Pickled files will be compressed with the `gzip` module. Load them with `import pickle; import gzip; pickle.load(gzip.open('filename','rb'))`.
 
 ### Copy files to the server directory from your local working directory
 
