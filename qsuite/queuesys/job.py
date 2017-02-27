@@ -99,17 +99,26 @@ def job(j,resultpath=None,cf=None):
 
 
     #import the simulation module
-    if sys.version_info[0] == 2:
-        import imp
-        simcode = imp.load_source("sim",simcode_path)
-    elif sys.version_info >= (3,5):
-        import importlib.util
-        specifications = importlib.util.spec_from_file_location("sim",simcode_path)
-        simcode = importlib.util.module_from_spec(specifications)
-        specifications.loader.exec_module(simcode)
-    else:
-        print("Python version",sys.version_info[0],"not supported.")
-        sys.exit(1)
+    try:
+        if sys.version_info[0] == 2:
+            import imp
+            simcode = imp.load_source("sim",simcode_path)
+        elif sys.version_info >= (3,5):
+            import importlib.util
+            specifications = importlib.util.spec_from_file_location("sim",simcode_path)
+            simcode = importlib.util.module_from_spec(specifications)
+            specifications.loader.exec_module(simcode)
+        else:
+            print("Python version",sys.version_info[0],"not supported.")
+            sys.exit(1)
+    except Exception as e:
+        # in case there's an error, write that into the progress file
+        if not is_local:
+            with open(cf.serverpath+"/output/progress_%d" % j,"w") as progressfile:
+                progressfile.write("error: "+e.__class__.__name__+"\n")
+
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1) 
 
     #get kwargs for the simulation of this jobnumber
     job_kwargs = cf.get_kwargs(cf.parameter_names,cf.parameter_list[j])
