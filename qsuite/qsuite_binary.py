@@ -32,6 +32,9 @@ import re
 from operator import itemgetter
 from itertools import groupby
 
+from pathos.multiprocessing import ProcessingPool as Pool
+from functools import partial
+
 try:
     # Python 2
     import cPickle as pickle
@@ -307,16 +310,17 @@ def main():
         elif cmd in test_cmds:
 
             cf = qconfig(qsuiteparser=qsuiteparser)
+            print(type(cf))
 
             if cmd == "test":
 
                 if len(args)==1:
                     jobid = 0
                     respath = os.path.join(os.getcwd(),".test")
-                elif len(args)==2 and not args[1] == "local":
+                elif len(args)==2:
                     jobid = int(args[1])
                     respath = os.path.join(os.getcwd(),".test")
-                elif len(args)>2 and not args[1] == "local":
+                elif len(args)>2:
                     jobid = int(args[1])
                     respath = args[2]
 
@@ -329,12 +333,23 @@ def main():
                 jobids = range(N_jobs)
                 respath = "current_results"
 
+                def local_job(j_id,N_jobs=None,respath=None,cf=None):
+                    print(j_id+1,"/",N_jobs)
+                    job(j_id,respath,cf)
+
                 wrap_local(cf)
 
                 sys.path.insert(1,os.getcwd()) #add current working directory to import paths
-                for j_id in jobids:
-                    print(j_id+1,"/",N_jobs)
-                    job(j_id,respath,cf)
+
+                if hasattr(cf,"n_local_cpus"):
+                    ncpu = cf.n_local_cpus
+                else:
+                    ncpu = 1
+
+                partial_job = partial(local_job,N_jobs=N_jobs,respath=respath,cf=cf)
+                print("Starting local job with", ncpu, "CPUs")
+                pool = Pool(ncpu)    
+                pool.map(partial_job,jobids)
 
                 from qsuite.queuesys.wrap_results import wrap_results as _wrap
                 _wrap(is_local=True,localrespath=respath)

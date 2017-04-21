@@ -440,6 +440,14 @@ $ qsuite test $EXTERNALJOBID <directory>    # tests job with given external job 
 
 ### Computing everything locally
 
+In your `qsuite_config.py` add the line
+```python
+n_local_cpus = X
+```
+where X is the number of free CPUs that you can use for local computations. If this line is not given, `qsuite` assumes `n_local_cpus = 1`.
+
+Do
+
 ```bash
 $ qsuite local
 ```

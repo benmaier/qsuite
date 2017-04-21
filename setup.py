@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qsuite',
-      version='0.4.2',
+      version='0.4.3',
       description='',
       url='https://bitbucket.org/bfmaier/rocs-queueing-suite',
       author='Benjamin F. Maier',
@@ -13,6 +13,7 @@ setup(name='qsuite',
           'numpy',
           'paramiko',
           'tabulate',
+          'pathos',
       ],
       dependency_links=[
           ],
