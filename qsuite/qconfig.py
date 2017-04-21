@@ -144,6 +144,9 @@ class qconfig(object):
 
         return kwargs
 
+    def get_number_of_jobs(self):
+        return len(self.parameter_list)
+
     
 if __name__=="__main__":
 

@@ -141,7 +141,7 @@ def main():
     sftp_cmds = ["sftp","scp","ftp","put"]
     customwrap_cmds = ["customwrap"]
     get_cmds = ["get"]
-    test_cmds = ["test"]
+    test_cmds = ["test", "local"]
     err_cmds = ["err","error"]
     param_cmds = ["params"]
     convert_cmds = ["convert"]
@@ -305,20 +305,41 @@ def main():
                 sys.exit(1)
 
         elif cmd in test_cmds:
-            if len(args)==1:
-                jobid = 0
-                respath = os.path.join(os.getcwd(),".test")
-            elif len(args)==2:
-                jobid = int(args[1])
-                respath = os.path.join(os.getcwd(),".test")
-            elif len(args)>2:
-                jobid = int(args[1])
-                respath = args[2]
 
             cf = qconfig(qsuiteparser=qsuiteparser)
-            sys.path.insert(1,os.getcwd()) #add current working directory to import paths
-            job(jobid,respath,cf)
-            sys.exit(0)                
+
+            if cmd == "test":
+
+                if len(args)==1:
+                    jobid = 0
+                    respath = os.path.join(os.getcwd(),".test")
+                elif len(args)==2 and not args[1] == "local":
+                    jobid = int(args[1])
+                    respath = os.path.join(os.getcwd(),".test")
+                elif len(args)>2 and not args[1] == "local":
+                    jobid = int(args[1])
+                    respath = args[2]
+
+                sys.path.insert(1,os.getcwd()) #add current working directory to import paths
+                job(jobid,respath,cf)
+
+            elif cmd == "local":
+
+                N_jobs = cf.get_number_of_jobs()
+                jobids = range(N_jobs)
+                respath = "current_results"
+
+                wrap_local(cf)
+
+                sys.path.insert(1,os.getcwd()) #add current working directory to import paths
+                for j_id in jobids:
+                    print(j_id+1,"/",N_jobs)
+                    job(j_id,respath,cf)
+
+                from qsuite.queuesys.wrap_results import wrap_results as _wrap
+                _wrap(is_local=True,localrespath=respath)
+
+            sys.exit(0)     
 
         elif cmd in param_cmds:
             cf = qconfig(qsuiteparser=qsuiteparser)
@@ -395,8 +416,14 @@ def main():
 
                 sys.exit(0)
             elif cmd in wrap_cmds:
-                wrap_results(cf,ssh)
-                ssh_command
+                if len(args) == 1:
+                    wrap_results(cf,ssh)
+                    ssh_command
+                elif args[1] == "local":
+                    respath = 'current_results'
+                    from qsuite.queuesys.wrap_results import wrap_results as _wrap
+                    _wrap(is_local=True,localrespath=respath)
+
                 sys.exit(0)
             elif cmd in customwrap_cmds:
                 custom_wrap_results(cf,ssh)
