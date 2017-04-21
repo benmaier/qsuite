@@ -387,7 +387,7 @@ def main():
 
                             if len(array_ids)>0:
                                 ranges = []
-                                for k, g in groupby(enumerate(array_id), lambda (i,x):i-x):
+                                for k, g in groupby(enumerate(array_id), lambda i,x:i-x):
                                     group = map(itemgetter(1), g)
                                     if group[0]==group[-1]:
                                         ranges.append(group[0])
