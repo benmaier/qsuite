@@ -438,5 +438,16 @@ $ qsuite test $EXTERNALJOBID     # tests job with given external job id and save
 $ qsuite test $EXTERNALJOBID <directory>    # tests job with given external job id and saves in <directory>
 ```
 
+### Computing everything locally
 
+```bash
+$ qsuite local
+```
+
+The results will be subsequently wrapped locally and moved to the simulation directory. 
+However, if there occurs an error you can wrap manually with
+
+```bash
+$ qsuite wrap local
+```
 
