@@ -215,6 +215,14 @@ def main():
             mn, err = data.mean(axis=axis), data.std(axis=axis)/np.sqrt(N)
             np.savez("./results_mean_err.npz",mean=mn,err=err)
 
+        if not os.path.exists(os.path.join(cwd, "results.p.gz"))\
+            and os.path.exists(os.path.join(cwd, "results.p")):
+            p = subprocess.Popen(["gzip", "results.p"])
+            exit_code = p.wait()
+            if exit_code == 1:
+                print("error while using gzip results.p")
+                sys.exit(1)
+
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
                  set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
                  get_cmds + test_cmds + param_cmds + qstatus_cmds + err_cmds):
