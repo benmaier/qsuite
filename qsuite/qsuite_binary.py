@@ -404,11 +404,12 @@ def main():
                             array_id = []
                             last_id = 0
                             for j in range(len(cf.parameter_list)):
-                                #print(progresses[j][0].upper())
+                                print(j,progresses[j][0].upper())
                                 if any( kw in progresses[j][-1].upper() or kw in progresses[j][0].upper() for kw in key_words ):                                    
                                     array_id.append(j+1)
 
-                            if len(array_ids)>0:
+                            print(array_id)
+                            if len(array_id)>0:
                                 ranges = []
                                 for k, g in groupby(enumerate(array_id), lambda i,x:i-x):
                                     group = map(itemgetter(1), g)
