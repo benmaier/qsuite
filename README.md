@@ -388,6 +388,14 @@ Careful! It's not interactive yet, so you won't be able to enter passwords or an
 $ qsuite ssh "command series"
 ```
 
+If you want to do something in the server directory of the project, you can use the keyword `DIR`, e.g.
+
+```bash
+$ qsuite ssh "ls DIR/results/"
+```
+
+and qsuite will replace it with the right path given in `qsuite_config.py`.
+
 ### Change the default files for configuration and simulation
 
 This will copy the file to the `.qsuite` directory in the user's home directory.

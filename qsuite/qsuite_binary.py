@@ -374,6 +374,9 @@ def main():
             cf = qconfig(qsuiteparser=qsuiteparser)
             ssh = ssh_connect(cf)
 
+            # replace directory keyword with path
+            for iarg, arg in enumerate(args):
+                args[iarg] = args[iarg].replace("DIR",cf.serverpath)
          
             if cmd in git_cmds:
                 update_git(cf,ssh)
