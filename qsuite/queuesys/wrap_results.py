@@ -11,6 +11,42 @@ except ImportError:
     # Python 3
     import pickle
 
+def _update_progress(progress, bar_length=40, status=""):        
+        """
+        This function was coded by Marc Wiedermann (https://github.com/marcwie)
+
+        Draw a progressbar according to the actual progress of a calculation.
+
+        Call this function again to update the progressbar.
+
+        :type progress: number (float)
+        :arg  progress: Percentile of progress of a current calculation.
+
+        :type bar_length: number (int)
+        :arg  bar_length: The length of the bar in the commandline.
+
+        :type status: str
+        :arg  status: A message to print behing the progressbar.
+        """
+        block = int(round(bar_length*progress))
+        text = "\r[{0}] {1}% {2}".format("="*block + " "*(bar_length-block),
+                                         round(progress, 3)*100, status)
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        if progress >= 1:
+            sys.stdout.write("\n")
+
+def _get_timeleft_string(t):
+    d, remainder = divmod(t,24*60*60)
+    h, remainder = divmod(remainder,60*60)
+    m, s = divmod(remainder,60)
+    t = [d,h,m,s]
+    t_str = ["%dd", "%dh", "%dm", "%ds"]
+    it = 0 
+    while it<4 and t[it]==0.:
+        it += 1
+    text = (" ".join(t_str[it:it+2])) % tuple(t[it:it+2])
+    return text
 
 def wrap_results(is_local=False,localrespath="current_results"):
 
@@ -69,6 +105,8 @@ def wrap_results(is_local=False,localrespath="current_results"):
                 times[flat_index] = time[i]
                 if not cf.only_save_times:
                     results[flat_index] = res[i]
+
+        _update_progress((j+1.)/(cf.jmax+1.))
 
     if loading_successful:
         # convert to lists for better portability
