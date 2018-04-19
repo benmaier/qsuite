@@ -110,7 +110,7 @@ def _update_progress(progress, bar_length=40, status=""):
     :arg  status: A message to print behing the progressbar.
     """
     block = int(round(bar_length*progress))
-    text = "\r[{0}] {1}% {2}".format("="*block + " "*(bar_length-block),
+    text = "\r[{0}] {1:4.1f}% {2}".format("="*block + " "*(bar_length-block),
                                      round(progress, 3)*100, status)
     sys.stdout.write(text)
     sys.stdout.flush()
