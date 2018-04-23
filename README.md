@@ -436,8 +436,26 @@ $ qsuite qstat all  #shows the whole queue
 $ qsuite qstat job  #shows the status of the current job
 ```
 
-
 Alternatives to `qstat` are `stat` and `status`.
+
+### Estimate the size of the produced data
+
+```bash
+$ qsuite estimate $NUMBER_OF_BYTES_PER_PARAMETER_COMBINATION
+$ qsuite estimatespace $NUMBER_OF_BYTES_PER_PARAMETER_COMBINATION
+$ qsuite data $NUMBER_OF_BYTES_PER_PARAMETER_COMBINATION
+```
+
+Give an estimation of the size of the produced data. An example is the following. 
+Your function `simulation_code` returns a list of 2 `numpy`-arrays, 
+each containing 100 `numpy`-floats. Each of those floats has a size of 8 bytes. Now
+you can estimate the size of the produced data as
+
+```bash
+$ qsuite estimate "2*100*8"
+```
+
+and qsuite automatically evaluates the multiplication.
 
 ### Testing the simulation locally
 ```bash

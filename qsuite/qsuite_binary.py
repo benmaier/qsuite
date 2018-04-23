@@ -3,6 +3,11 @@ import os
 import sys
 import qsuite
 import subprocess
+import math 
+
+from functools import reduce
+import operator
+
 from qsuite import qconfig
 import ast
 from qsuite import get_template_file
@@ -148,6 +153,7 @@ def main():
     err_cmds = ["err","error"]
     param_cmds = ["params"]
     convert_cmds = ["convert"]
+    estimation_cmds = ["estimate", "estimatespace", "data"]
 
     if cmd in ["init","initialize"]:
         if len(args)==1:
@@ -225,7 +231,7 @@ def main():
 
     elif cmd in (git_cmds + submit_cmds + prep_cmds + reset_cmds + add_cmds + rm_cmds +\
                  set_cmds + wrap_cmds + status_cmds + ssh_cmds + sftp_cmds + customwrap_cmds +\
-                 get_cmds + test_cmds + param_cmds + qstatus_cmds + err_cmds):
+                 get_cmds + test_cmds + param_cmds + qstatus_cmds + err_cmds + estimation_cmds):
 
         #I do this to prevent that the default stuff can only be set in an initialized dir
         if not (cmd in set_cmds and len(args)>1 and args[1].startswith("default")):
@@ -367,6 +373,38 @@ def main():
         elif cmd in param_cmds:
             cf = qconfig(qsuiteparser=qsuiteparser)
             print_params(cf)
+
+        elif cmd in estimation_cmds:
+
+            if len(args)>1:
+                bytestring = args[1]
+            else:
+                print("No number of bytes per parameter combination given.")
+                sys.exit(1)
+
+            cf = qconfig(qsuiteparser=qsuiteparser)
+
+            #get dimensions of the list space
+            pdims = [ len(p[1]) for p in cf.external_parameters ]
+            idims = [ len(p[1]) for p in cf.internal_parameters ]
+
+            def get_size_string(number_of_bytes):
+                if number_of_bytes == 0:
+                    return "0B"
+                names = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+                i = int(math.floor(math.log(number_of_bytes, 1024)))
+                p = math.pow(1024, i)
+                s = round(number_of_bytes / p, 2)
+                return "%s %s" % (s, names[i])
+
+            number_of_bytes_per_combination = eval(bytestring)
+            result_internal = reduce(operator.mul, idims, 1) * number_of_bytes_per_combination
+            number_of_external = reduce(operator.mul, pdims, 1)
+            result_external = number_of_external * result_internal
+
+            print("This job will generate {0:d} jobs, each of an estimated size of {1}.".format(number_of_external, get_size_string(result_internal)))
+            print("This means that the total size of the generated data will be an estimated {0}".format(get_size_string(result_external)))
+
 
         elif cmd in git_cmds + prep_cmds + submit_cmds + wrap_cmds + status_cmds +\
                     ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + qstatus_cmds + err_cmds:
