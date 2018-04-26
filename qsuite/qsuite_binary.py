@@ -46,6 +46,7 @@ try:
 except ImportError:
     # Python 3
     import pickle
+    basestring = str
 
 if sys.version_info[0] == 3:
     raw_input = input
@@ -204,7 +205,11 @@ def main():
                     print("error while using gzip -d results.p.gz")
                     sys.exit(1)
 
-            data = pickle.load(open("results.p","rb"))
+            try:
+                data = pickle.load(open("results.p","rb"))
+            except UnicodeDecodeError:
+                data = pickle.load(open("results.p","rb"), encoding='latin1')
+
             data = np.array(data)
             np.save("results.npy",data)
             data_already_loaded = True
