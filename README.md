@@ -242,6 +242,10 @@ $ qsuite submit err wait   # submits all jobs which are in either of above
 where `$ARRAY_ID` is the job number for which you want to restart the calculation. Note that the job must have been submitted before. 
 ## Basic functions
 
+### Seed behavior
+
+QSuite checks for the variable `seed` in the file `qsuite_config.py`. If it is set, if it is not `None` and if it is `>= 0`, each parameter configuration gets an own seed, which is `seed + ip` where `ip` is the integer id of the parameter configuration. It will be passed as `kwargs['seed']` to the simulation function. If `seed`, however, is a keyword already set by the user, the parameter seed will be passed as `kwargs['randomseed']`.
+
 ### Error handling
 
 Putting errors in code is each scientist's favorite hobby. Hence, `qsuite` catches occuring errors and writes them into progress files, s.t. you can see the job is not running anymore by typing `qsuite stat`. However, often you want to explicitly see the errors. Hence, you can use

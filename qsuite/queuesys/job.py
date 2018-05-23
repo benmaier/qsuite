@@ -142,7 +142,7 @@ def job(j,resultpath=None,cf=None):
         kwargs.update(cf.std_kwargs)
 
         #add seed
-        if cf.seed>=0:
+        if hasattr(cf,'seed') and cf.seed is not None and cf.seed>=0:
             key = 'seed'
             if key in kwargs:
                 key = 'randomseed'
