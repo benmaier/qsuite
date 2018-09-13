@@ -22,6 +22,11 @@ if os.path.exists("./qconfig.py"):
 else:
     from qsuite import qconfig
 
+def _get_progress_fn(cf, j):
+    str_len = str(len(str(len(cf.parameter_list)-1)))
+    fmt = "%0"+str_len+"d"
+    return cf.serverpath + ("/output/progress_"+fmt) % j
+
 def _update_progress(progress, bar_length=40, status=""):        
         """
         This function was coded by Marc Wiedermann (https://github.com/marcwie)
@@ -114,7 +119,7 @@ def job(j,resultpath=None,cf=None):
     except Exception as e:
         # in case there's an error, write that into the progress file
         if not is_local:
-            with open(cf.serverpath+"/output/progress_%d" % j,"w") as progressfile:
+            with open(_get_progress_fn(cf,j),"w") as progressfile:
                 progressfile.write("error: "+e.__class__.__name__+"\n")
 
         traceback.print_exc(file=sys.stderr)
@@ -134,7 +139,7 @@ def job(j,resultpath=None,cf=None):
 
         #if this is the first run, initiate the progress bar
         if not is_local and ip==0:
-            _update_progress_file(ip-1,N_int_param,[],cf.serverpath+"/output/progress_%d" % j)
+            _update_progress_file(ip-1,N_int_param,[],_get_progress_fn(cf,j))
 
         #wrap all kwargs necessary for the simulation
         kwargs = cf.get_kwargs(cf.internal_names,cf.internal_parameter_list[ip])
@@ -156,7 +161,7 @@ def job(j,resultpath=None,cf=None):
         except Exception as e:
             # in case there's an error, write that into the progress file
             if not is_local:
-                with open(cf.serverpath+"/output/progress_%d" % j,"w") as progressfile:
+                with open(_get_progress_fn(cf,j),"w") as progressfile:
                     progressfile.write("error: "+e.__class__.__name__+"\n")
 
             traceback.print_exc(file=sys.stderr)
@@ -172,7 +177,7 @@ def job(j,resultpath=None,cf=None):
             else:
                 _update_progress((ip + 1.)/N_int_param,40,"est. time per measurement: "+ str(mean(times[:ip+1])) )
         else:
-            _update_progress_file(ip,N_int_param,times[:ip+1],cf.serverpath+"/output/progress_%d" % j)
+            _update_progress_file(ip,N_int_param,times[:ip+1],_get_progress_fn(cf,j))
         
     #save results
     if not os.path.exists(cf.resultpath):

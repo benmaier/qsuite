@@ -3,7 +3,12 @@ from tabulate import tabulate
 import copy
 from qsuite import ssh_command
 
+import tempfile
 
+def _get_progress_fn(cf, j):
+    str_len = str(len(str(len(cf.parameter_list)-1)))
+    fmt = "%0"+str_len+"d"
+    return cf.serverpath + ("/output/progress_"+fmt) % j
 
 
 def print_params(cf):
@@ -17,31 +22,38 @@ def print_params(cf):
     print(tabulate(params, headers=["Job ID"] + names + ["Array ID"]))
 
 
-def _get_progress(cf,ssh):
-    ssh_cmd = ' '.join(['for cat '+cf.serverpath+"/output/progress_%d;" % j for j in range(len(cf.parameter_list)) ])
-    N = len(cf.parameter_list)-1
-    filepath = cf.serverpath + "/output/progress_"
-    cmd = ('for i in `seq 0 %d`; do cat '+filepath+'$i; done;') % N
-    progresses_ = ssh_command(ssh,cmd,noprint=True)
-    progresses_ = progresses_.split("\n")[:-1]
-    progresses = []
-    for p in progresses_:
-        if len(p)>1:
-            text_and_time = p.split("__")
-            if len(text_and_time)==1:
-                text_and_time.append("")
-        else:
-            text_and_time = ['waiting...','']
+def _get_progress_sftp(cf,ssh):
 
-        progresses.append(text_and_time)
+    N = len(cf.parameter_list)-1
+    filepath = cf.serverpath + "/output/progress_*"
+    cmd = "cd " +cf.serverpath + "/output/; cat progress_* > all_progress" 
+    ssh_command(ssh,cmd,noprint=True)
+
+    ftp = ssh.open_sftp()
+
+    with tempfile.TemporaryFile() as tmp:
+
+        ftp.getfo(cf.serverpath + "/output/all_progress", tmp)
+        tmp.seek(0)
+
+        progresses_ = [ s.decode('utf-8')[:-1] for s in tmp.readlines() ]
+        progresses = []
+        for p in progresses_:
+            if len(p)>1:
+                text_and_time = p.split("__")
+                if len(text_and_time)==1:
+                    text_and_time.append("")
+            else:
+                text_and_time = ['waiting...','']
+
+            progresses.append(text_and_time)
 
     return progresses
-
 
 def print_status(cf,ssh):
 
     #for each parameter combination, add job id (j) in the beginning and arrayjob id in the end
-    progresses = _get_progress(cf,ssh)
+    progresses = _get_progress_sftp(cf,ssh)
     prog = []
 
     record_waiting_id = False

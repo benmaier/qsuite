@@ -30,7 +30,7 @@ from qsuite import print_params
 from qsuite import print_status
 from qsuite import print_params_and_status
 from qsuite.queuesys.job import job
-from qsuite.printparams import _get_progress
+from qsuite.printparams import _get_progress_sftp
 import shutil
 import re
 
@@ -446,7 +446,7 @@ def main():
 
                             print("Fetching array IDs that produced errors with keywords", " and ".join(key_words))
                             #print(key_words)
-                            progresses = _get_progress(cf,ssh)
+                            progresses = _get_progress_sftp(cf,ssh)
                             array_id = []
                             last_id = 0
                             for j in range(len(cf.parameter_list)):
