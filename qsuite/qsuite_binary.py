@@ -458,7 +458,7 @@ def main():
                             if len(array_id)>0:
                                 ranges = []
                                 for k, g in groupby( enumerate(array_id), lambda IX:IX[0]-IX[1]):
-                                    group = map(itemgetter(1), g)
+                                    group = list(map(itemgetter(1), g))
                                     if group[0]==group[-1]:
                                         ranges.append(group[0])
                                     else:
