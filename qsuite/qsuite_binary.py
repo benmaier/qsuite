@@ -226,6 +226,18 @@ def main():
             mn, err = data.mean(axis=axis), data.std(axis=axis)/np.sqrt(N)
             np.savez("./results_mean_err.npz",mean=mn,err=err)
 
+        if "nanmeanerr" in cmds:
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            N = len((cf.external_parameters+cf.internal_parameters)[axis][1])
+            mn, err = np.nanmean(data,axis=axis), np.nanstd(data,axis=axis)/np.sqrt(N)
+            np.savez("./results_mean_err.npz",mean=mn,err=err)
+
         if not os.path.exists(os.path.join(cwd, "results.p.gz"))\
             and os.path.exists(os.path.join(cwd, "results.p")):
             p = subprocess.Popen(["gzip", "results.p"])
