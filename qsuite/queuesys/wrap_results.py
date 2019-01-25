@@ -115,9 +115,11 @@ def wrap_results(is_local=False,localrespath="current_results"):
 
         try:
             #save the wrapped data
-            pickle.dump(times,open(outputpath+"/times.p",'wb'))
+            with open(outputpath+"/times.p",'wb') as dumpfile:
+                pickle.dump(times,dumpfile)
             if not cf.only_save_times:
-                pickle.dump(results,open(outputpath+"/results.p",'wb'))
+                with open(outputpath+"/results.p",'wb') as dumpfile:
+                    pickle.dump(results,dumpfile)
         except Exception as e:
             print("couldn't write files")
             print("Error:",e)

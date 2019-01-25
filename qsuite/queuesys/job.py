@@ -184,10 +184,12 @@ def job(j,resultpath=None,cf=None):
         os.mkdir(cf.resultpath)
 
     if any([result is not None for result in results]) and not cf.only_save_times:
-        pickle.dump(results,open(cf.resultpath+'/results_%d.p' % (j),'wb'),protocol=pickle.HIGHEST_PROTOCOL)
+        with open(cf.resultpath+'/results_%d.p' % (j),'wb') as dumpfile:
+            pickle.dump(results,dumpfile,protocol=pickle.HIGHEST_PROTOCOL)
 
     #save times needed
-    pickle.dump(times,open(cf.resultpath+'/times_%d.p' % (j),'wb'),protocol=pickle.HIGHEST_PROTOCOL)
+    with open(cf.resultpath+'/times_%d.p' % (j),'wb') as dumpfile:
+        pickle.dump(times,dumpfile,protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__=="__main__":
