@@ -82,12 +82,17 @@ def wrap_results(is_local=False,localrespath="current_results"):
         else:
             pcoords = []
 
-        try:
-            time = pickle.load(open(resultpath+"/times_%d.p" % j,'rb'))
-            if not cf.only_save_times:
-                res = pickle.load(open(resultpath+"/results_%d.p" % j,'rb'))
-                #print res
-        except Exception as e:
+        if os.path.exists(resultpath+"/times_%d.p" % j) and os.path.exists(resultpath+"/results_%d.p" % j):
+
+            if loading_successful:
+
+                with open(resultpath+"/times_%d.p" % j,'rb') as this_file:
+                    time = pickle.load(this_file)
+
+                if not cf.only_save_times:
+                    with open(resultpath+"/results_%d.p" % j,'rb') as this_file:
+                        res = pickle.load(this_file)
+        else:
             if loading_successful:
                 print("*** Caught Exception: Files missing! Jobs with the following ARRAY IDs did not produce results:")
             missing_array_ids.append(j+1)
@@ -132,7 +137,23 @@ def wrap_results(is_local=False,localrespath="current_results"):
             if not cf.only_save_times:
                 os.remove(resultpath+"/results_%d.p" % j)
     else: 
-        print(' '.join([ str(d) for d in missing_array_ids ]))
+        i = 0
+        missing_array_id_strings = []
+
+        while i < len(missing_array_ids):
+            this_id = missing_array_ids[i]
+            this_str = str(this_id)
+            while i+1 < len(missing_array_ids) and missing_array_ids[i+1] == this_id+1:
+                i += 1
+                this_id = missing_array_ids[i]
+
+            if (i+1 == len(missing_array_ids) or this_id+1 != missing_array_ids[i+1]) and this_str != str(this_id):
+                this_str += '-' + str(this_id)
+
+            missing_array_id_strings.append(this_str)
+            i += 1
+
+        print(' '.join(missing_array_id_strings))
         sys.exit(1)
 
 if __name__ == "__main__":
