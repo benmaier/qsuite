@@ -77,9 +77,9 @@ def print_status(cf,ssh):
                 j += 1
 
             if old_id==j:
-                prog.append( [ old_id ] + progresses[old_id])
-                if j<len(progresses):
-                    prog.append( [ j+1 ] + progresses[j])
+                prog.append( [ old_id ] + progresses[old_id-1])
+                #if j<len(progresses):
+                #    prog.append( [ j+1 ] + progresses[j])
             else:
                 prog.append( [ str(old_id)+"-"+str(j) ] + progresses[j-1])
 
@@ -92,9 +92,9 @@ def print_status(cf,ssh):
                 j += 1
 
             if old_id==j:
-                prog.append( [ old_id ] + progresses[old_id])
-                if j<len(progresses):
-                    prog.append( [ j+1 ] + progresses[j])
+                prog.append( [ old_id ] + progresses[old_id-1])
+                #if j<len(progresses):
+                #    prog.append( [ j+1 ] + progresses[j])
             else:
                 prog.append( [ str(old_id)+"-"+str(j) ] + progresses[j-1])
 
