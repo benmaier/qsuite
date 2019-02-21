@@ -7,8 +7,8 @@ import tempfile
 
 def _get_progress_fn(cf, j):
     str_len = str(len(str(len(cf.parameter_list)-1)))
-    fmt = "%0"+str_len+"d"
-    return cf.serverpath + ("/output/progress_"+fmt) % j
+    fmt = "%0"+str_len+"d_%d"
+    return cf.serverpath + ("/output/progress_"+fmt) % (j, len(cf.parameter_list)-1)
 
 
 def print_params(cf):
@@ -25,8 +25,8 @@ def print_params(cf):
 def _get_progress_sftp(cf,ssh):
 
     N = len(cf.parameter_list)-1
-    filepath = cf.serverpath + "/output/progress_*"
-    cmd = "cd " +cf.serverpath + "/output/; cat progress_* > all_progress" 
+    filepath = cf.serverpath + "/output/progress_*_"+str(N)
+    cmd = "cd " +cf.serverpath + "/output/; cat progress_*_"+str(N)+" > all_progress" 
     ssh_command(ssh,cmd,noprint=True)
 
     ftp = ssh.open_sftp()
@@ -109,7 +109,7 @@ def print_status(cf,ssh):
 def print_params_and_status(cf,ssh):
     
     #for each parameter combination, add job id (j) in the beginning and arrayjob id in the end
-    progresses = _get_progress(cf,ssh)
+    progresses = _get_progress_sftp(cf,ssh)
     table = [ [j] + list(p[0]) + [j+1] + list(p[1]) for j,p in enumerate(zip(cf.parameter_list,progresses)) ]
 
     #get names from config, besides if the entry is None and the length is equal to the number of measurements, then add MeasID

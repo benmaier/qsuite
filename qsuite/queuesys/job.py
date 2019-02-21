@@ -24,8 +24,8 @@ else:
 
 def _get_progress_fn(cf, j):
     str_len = str(len(str(len(cf.parameter_list)-1)))
-    fmt = "%0"+str_len+"d"
-    return cf.serverpath + ("/output/progress_"+fmt) % j
+    fmt = "%0"+str_len+"d_%d"
+    return cf.serverpath + ("/output/progress_"+fmt) % (j, len(cf.parameter_list)-1))
 
 def _update_progress(progress, bar_length=40, status=""):        
         """
