@@ -134,15 +134,15 @@ def start_job(cf,ssh,array_id=None):
     N = len(cf.parameter_list)-1
     filepath = cf.serverpath + "/output/progress_"
     if array_id is None:
-        cmd = ('for i in `seq -w 0 %d`; do echo " " > '+filepath+'$i; done;') % N
+        cmd = ('for i in `seq -w 0 %d`; do echo " " > '+filepath+'${i}_%d; done;') % (N,N)
     elif type(array_id) is list or type(array_id) is tuple:
         cmd = ""
         for a_id in array_id:
             if type(a_id) in [ tuple, list ]:
-                cmd += (' for i in `seq -w %d %d`; do echo " " > '+filepath+'$i; done;') % tuple(a_id)
+                cmd += (' for i in `seq -w %d %d`; do echo " " > '+filepath+'${i}_%d; done;') % tuple(list(a_id) + [N])
             else:
-                cmd += (' echo " " > '+filepath+'%d; done;') % (int(a_id)-1)
+                cmd += (' echo " " > '+filepath+'%d_%d; done;') % (int(a_id)-1,N)
     else:
-        cmd = ('echo " " > '+filepath+'%d; done;') % (int(array_id)-1)
+        cmd = ('echo " " > '+filepath+'%d_%d; done;') % (int(array_id)-1,N)
     ssh_command(ssh,cmd)
     
