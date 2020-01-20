@@ -11,7 +11,12 @@ except ImportError:
     # Python 3
     import pickle
 
-def _update_progress(progress, bar_length=40, status=""):        
+class _progress_updater():
+
+    def __init__(self):
+        self.text = ""
+
+    def update_progress(self,progress, bar_length=40, status=""):        
         """
         This function was coded by Marc Wiedermann (https://github.com/marcwie)
 
@@ -31,10 +36,12 @@ def _update_progress(progress, bar_length=40, status=""):
         block = int(round(bar_length*progress))
         text = "\r[{0}] {1:4.1f}% {2}".format("="*block + " "*(bar_length-block),
                                          round(progress, 3)*100, status)
-        sys.stdout.write(text)
-        sys.stdout.flush()
-        if progress >= 1:
-            sys.stdout.write("\n")
+        if text != self.text:
+            self.text = text
+            sys.stdout.write(text)
+            sys.stdout.flush()
+            if progress >= 1:
+                sys.stdout.write("\n")
 
 def _get_timeleft_string(t):
     d, remainder = divmod(t,24*60*60)
@@ -75,6 +82,7 @@ def wrap_results(is_local=False,localrespath="current_results"):
     #wrap results of the simulations
     loading_successful = True
     missing_array_ids = []
+    updater = _progress_updater()
     for j in range(cf.jmax+1):
         #get coords in list space from linear index
         if len(pdims) > 0:
@@ -111,7 +119,7 @@ def wrap_results(is_local=False,localrespath="current_results"):
                 if not cf.only_save_times:
                     results[flat_index] = res[i]
 
-        _update_progress((j+1.)/(cf.jmax+1.))
+        updater.update_progress((j+1.)/(cf.jmax+1.))
 
     if loading_successful:
         # convert to lists for better portability
