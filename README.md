@@ -6,7 +6,7 @@ Provides a general framework to submit array jobs on an SGE (Sun Grid Engine) or
 
 In order for `qsuite` to function properly, you have to implement an automatic login to your compute cluster. Say your username there is `quser` and the cluster address is `qclust`. On your local machine, your username is `localuser`.
 
-The following is adapted from http://www.linuxproblem.org/art_9.html . The first you have to do is to generate a pair of RSA authentication keys like it's done in the following. Note that in the current version of qsuite rsa files encrypted with a passphrase are not supported, so you shouldn't add one when you're using the commands below.
+The following is adapted from [linuxproblem.org](http://www.linuxproblem.org/art_9.html). The first you have to do is to generate a pair of RSA authentication keys like it's done in the following. Note that in the current version of qsuite rsa files encrypted with a passphrase are not supported, so you shouldn't add one when you're using the commands below.
 
 ```bash
 localuser$ ssh-keygen -t rsa
@@ -489,3 +489,39 @@ However, if there occurs an error you can wrap manually with
 $ qsuite wrap local
 ```
 
+### Changing the order of the result array
+
+Sometimes, you wrote an anlysis script that expects the indices of the result array/list to be ordered in
+a certain way. However, you might have changed the order of the parameters in the `qsuite_config`-file
+for various reasons. Instead of changing the indexing in the analysis file, you 
+can simply load the results and define a new parameter order. For instance, your config was set up as follows:
+
+```python
+external_parameters = [
+                        ( 'r0', r0s),
+                        ( 'w0', w0s),
+                        ( None   , measurements ),
+                      ]
+internal_parameters = [
+                        ('p5', p5s),
+                      ]
+```
+
+However, in your analysis file you want to access the results as `data[iw0,ir0,meas,ip5]`. What you can do is to set up the following in your analysis file
+
+
+```python
+import numpy as np
+from qsuite.tools import change_result_parameter_order, change_meanerr_parameter_order
+
+with open('results.npy','rb') as f:
+    data = np.load(f)
+    data_new = change_result_parameter_order(data,['w0','r0','p5',None])
+
+with open('results_mean_err.npz','rb') as f:
+    data = np.load(f)
+    mean = data['mean']
+    mean_new = change_meanerr_parameter_order(mean,['w0','r0','p5'])
+```
+
+Then, the new arrays carry the data in the desired order.
