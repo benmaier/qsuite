@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qsuite',
-      version='0.4.9',
+      version='0.4.10',
       description='',
       url='https://bitbucket.org/bfmaier/rocs-queueing-suite',
       author='Benjamin F. Maier',
