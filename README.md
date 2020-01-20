@@ -516,7 +516,7 @@ from qsuite.tools import change_result_parameter_order, change_meanerr_parameter
 
 with open('results.npy','rb') as f:
     data = np.load(f)
-    data_new = change_result_parameter_order(data,['w0','r0','p5',None])
+    data_new = change_result_parameter_order(data,['w0','r0',None,'p5'])
 
 with open('results_mean_err.npz','rb') as f:
     data = np.load(f)
