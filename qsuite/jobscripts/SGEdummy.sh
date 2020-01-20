@@ -12,6 +12,9 @@ if [ -f ~/.bash_profile ]; then
     source ~/.bash_profile
 fi
 
+export OMP_NUM_THREADS=1
+export USE_SIMPLE_THREADED_LEVEL3=1
+
 INDEX=$((SGE_TASK_ID-1))
 %s %s/job.py $INDEX
 
