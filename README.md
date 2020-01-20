@@ -524,4 +524,4 @@ with open('results_mean_err.npz','rb') as f:
     mean_new = change_meanerr_parameter_order(mean,['w0','r0','p5'])
 ```
 
-Then, the new arrays carry the data in the desired order.
+Then, the new arrays carry the data in the desired order. Also works on the original pickled list.
