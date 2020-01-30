@@ -24,13 +24,13 @@ ab:cd:1e:4e quser@qclust
 Now create an `.ssh` directory on the remote machine
 
 ```bash
-localuser$ ssh quser@qclust mkdir -p ~/.ssh
+localuser$ ssh quser@qclust mkdir -p "~/.ssh"
 ```
 
 and append your public key from your lcoal machine to the authorized key file on the cluster
 
 ```bash
-localuser$ cat ~/.ssh/id_rsa.pub | ssh quser@qclust 'cat >> ~/.ssh/authorized_keys'
+localuser$ cat ~/.ssh/id_rsa.pub | ssh quser@qclust "cat >> ~/.ssh/authorized_keys"
 ```
 
 ### Linux, Mac OSX
