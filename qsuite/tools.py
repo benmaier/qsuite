@@ -24,7 +24,7 @@ def change_result_parameter_order(results, new_order, ignore_measurement_axis=Fa
     if ignore_measurement_axis:
         params.pop(params.index(None))
     
-    new_indices = np.array([params.index(p) for p in new_order])
+    new_indices = np.array([new_order.index(p) for p in params])
     if not np.all(np.sort(new_indices) == np.arange(len(params))):
         raise ValueError("Every element in the list `new order` needs to have a corresponding element in the parameter configuration.")
 
