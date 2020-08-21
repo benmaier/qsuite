@@ -35,9 +35,9 @@ localuser$ cat ~/.ssh/id_rsa.pub | ssh quser@qclust "cat >> ~/.ssh/authorized_ke
 
 Note the following: "Both the host and the client should have the following permissions and owners:
 
-* `~/.ssh` permissions should be 700
+* `~/.ssh` permissions should be 700 (`cd ~; chmod 700 .ssh`)
 * `~/.ssh` should be owned by your account
-* `~/.ssh/authorized_keys` permissions should be 600
+* `~/.ssh/authorized_keys` permissions should be 600 (`cd ~/.ssh; chmod 600 authorized_keys`)
 * `~/.ssh/authorized_keys` should be owned by your account"
 
 as per [digitalocean](https://www.digitalocean.com/docs/droplets/resources/troubleshooting-ssh/authentication/).
