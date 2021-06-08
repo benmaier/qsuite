@@ -119,7 +119,7 @@ def init(qsuitefile,opts):
 
 
 def main():
-    
+
     #create the custom dir if it doesn't exist yet
 
     if len(sys.argv)==1:
@@ -178,7 +178,7 @@ def main():
         if (    (cmd not in set_cmds) \
              or (len(args)<2) \
              or (not args[1].startswith("default")) ):
-          
+
             #if there's no ".qsuite" file yet, stop operating
             print("Not initialized yet!")
             sys.exit(1)
@@ -190,13 +190,16 @@ def main():
         cmds = args[1:]
         if len(cmds)==0:
             cmds = ["numpy"]
-        
+
+        # numpy is imported here because I don't want to make qsuite
+        # dependent on it, and this will give an error on runtime,
+        # not when qsuite is started
         import numpy as np
 
         data_already_loaded = False
 
         if "numpy" in cmds or \
-           ("meanerr" in cmds and not os.path.exists("results.npy")):
+           (any([c in cmds for c in ["meanerr","nanmeanerr","meanstd","nanmeanstd","defaultpercentiles","percentiles","quartiles"]]) and not os.path.exists("results.npy")):
 
             if not os.path.exists(os.path.join(cwd, "results.p")):
                 p = subprocess.Popen(["gzip", "-d", "results.p.gz"])
@@ -237,6 +240,68 @@ def main():
             N = len((cf.external_parameters+cf.internal_parameters)[axis][1])
             mn, err = np.nanmean(data,axis=axis), np.nanstd(data,axis=axis)/np.sqrt(N)
             np.savez("./results_mean_err.npz",mean=mn,err=err)
+
+        if "meanstd" in cmds:
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            mn, err = data.mean(axis=axis), data.std(axis=axis)
+            np.savez("./results_mean_std.npz",mean=mn,std=err)
+
+        if "nanmeanstd" in cmds:
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            N = len((cf.external_parameters+cf.internal_parameters)[axis][1])
+            mn, err = np.nanmean(data,axis=axis), np.nanstd(data,axis=axis)
+            np.savez("./results_mean_std.npz",mean=mn,std=err)
+
+        percentiles_name = None
+
+        if "defaultpercentiles" in cmds:
+            percentiles_name = "defaultpercentiles"
+            cmds = ["percentiles"]
+            cmds.extend(["2.5","16","50","84","97.5"])
+
+        if "quartiles" in cmds:
+            percentiles_name = "quartiles"
+            cmds = ["percentiles"]
+            cmds.extend(["25","50","75"])
+
+        if "percentiles" in cmds:
+
+            if percentiles_name is None:
+                percentiles_name = "percentiles"
+            ndx = cmds.index("percentiles")
+            percentiles = cmds[ndx+1:]
+            if len(percentiles) == 0:
+                print("No percentiles provided. Please provide percentiles as list or use `defaultpercentiles` or `quartiles`")
+                sys.exit(1)
+            fperc = [float(p) for p in percentiles]
+
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            data_percentiles = np.percentile(data, fperc, axis=axis)
+            results = {}
+
+            for i, perc in enumerate(percentiles):
+                results[perc] = data_percentiles[i]
+            np.savez('./results_'+percentiles_name+".npz",**results)
+
+
 
         if not os.path.exists(os.path.join(cwd, "results.p.gz"))\
             and os.path.exists(os.path.join(cwd, "results.p")):

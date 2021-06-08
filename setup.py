@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qsuite',
-      version='0.4.12',
+      version='0.4.13',
       description='',
       url='https://github.com/benmaier/qsuite',
       author='Benjamin F. Maier',
