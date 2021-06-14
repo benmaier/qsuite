@@ -10,10 +10,10 @@ class BrownianMotion:
         self.tmax = tmax
         self.x0 = x0
 
-        if seed!=-1:
+        if seed != -1:
             np.random.seed(seed)
 
-        self.t = np.linspace(0,self.tmax,self.tmax/self.dt+1)
+        self.t = np.linspace(0,self.tmax,int(self.tmax/self.dt)+1)
         self.X = np.zeros((len(self.t),self.N))
         self.X[0,:] = x0*np.ones((self.N,))
 
@@ -25,8 +25,8 @@ class BrownianMotion:
             self.X[t,:] = self.X[t-1,:] + \
                           self.V*(self.r-self.X[t-1,:]) * self.dt + \
                           self.factor_B * np.random.randn(self.N)
-            ndcs_left  = np.nonzero(self.X[t,:]<-self.L/2)[0]
-            ndcs_right = np.nonzero(self.X[t,:]>+self.L/2)[0]
+            ndcs_left  = np.nonzero(self.X[t,:] < -self.L/2)[0]
+            ndcs_right = np.nonzero(self.X[t,:] > +self.L/2)[0]
             self.X[t,ndcs_left] += self.L
             self.X[t,ndcs_right] -= self.L
 
@@ -44,7 +44,6 @@ if __name__=="__main__":
     V = 1
     r = 0
     L = 1
-    
 
     sim = BrownianMotion(N=N,L=L,T=T,V=V,r=r,tmax=tmax,dt=dt)
     sim.simulate()
@@ -53,12 +52,11 @@ if __name__=="__main__":
 
     import matplotlib.pyplot as pl
 
-    bins = np.linspace(-L/2.,L/2.,11) 
+    bins = np.linspace(-L/2.,L/2.,11)
     bins_mean = 0.5*(bins[1:]+bins[:-1])
 
     for t_ in range(len(t)):
         vals,bins = np.histogram(X[t_,:],bins=bins,density=True)
         pl.plot(0.5*(bins[:-1]+bins[1:]),vals)
-    
 
     pl.show()
