@@ -1,5 +1,15 @@
 import os
 
+__version__ = "0.4.14"
+
+__author__ = "Benjamin F. Maier"
+__copyright__ = "Copyright 2015-2021, " + __author__
+__credits__ = [__author__]
+__license__ = "MIT"
+__maintainer__ = __author__
+__email__ = "contact@benmaier.org"
+__status__ = "Development"
+
 customdir = os.path.join(os.path.expanduser("~"),".qsuite")
 
 def rm(path):

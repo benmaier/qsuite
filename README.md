@@ -44,7 +44,7 @@ as per [digitalocean](https://www.digitalocean.com/docs/droplets/resources/troub
 
 ### Linux, Mac OSX
 
-```
+```bash
 $ sudo python setup.py install  #or
 $ sudo python3 setup.py install
 ```
@@ -53,7 +53,7 @@ $ sudo python3 setup.py install
 
 If you're not running a virtualenv python, make sure you add
 
-```
+```bash
 export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
 export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin:$PATH
 export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/3.5/bin:$PATH
@@ -71,13 +71,13 @@ LDFLAGS="-L/usr/local/opt/openssl/lib" CFLAGS="-I/usr/local/opt/openssl/include"
 
 ### Without root access
 
-```
+```bash
 $ python setup.py install --user
 ```
 
 Afterwards, add
 
-```
+```bash
 export PATH=~/.local/bin:$PATH
 ```
 
@@ -136,87 +136,89 @@ Three files appeared in your directory.
    This file holds the function `simulation_code` that will get called to start a single simulation with a fixed combination of parameters and a seed. All of those are passed in a dictionary called ``kwargs``. Ideally, the keys of ``kwargs`` are names of the parameters needed to initialize the simulation. In our case, ``simulation_code`` would load the class ``BrownianMotion`` from module ``brownian_motion``, feed the parameters to it, run the simulation and retrieve the result. The parameters are passed in a ``kwargs`` dictionary and subsequently can be used to do whatever we want to do with it. In the end, our simulation has a result, e.g. the trajectories *x*(*t*) of the particles. This result can be wrapped in whatever container we prefer and returned. QSuite will store it in a ``pickle`` and wrap it up once all jobs on the cluster are computed.
    
    Our file will look like this
-   ```python
-   from brownian_motion import BrownianMotion
 
-   def simulation_code(kwargs):
+```python
+from brownian_motion import BrownianMotion
 
-       bm = BrownianMotion(**kwargs)
-       bm.simulate()
-       result = bm.get_trajectories()
+def simulation_code(kwargs):
 
-       return result
-   ```
+   bm = BrownianMotion(**kwargs)
+   bm.simulate()
+   result = bm.get_trajectories()
+
+   return result
+```
 
 * `qsuite_config.py`
 
    Within fhis file we will edit the configuration of our experiment and add information about our queueing system. First, we have to decide which parameters should be used as *external* parameters. Those are parameters which are scanned using the cluster meaning that for every combination of those parameters one job is created on the cluster. Second, we decide for *internal* parameters, which means that inside of each job, every combination of those parameters will be simulated. Finally, we may decide that we don't need to scan all parameters, but just set *Δt*=0.01, so this will be a standard parameter (i.e. constant).
    
    Our file will look like this
-   ```python
-   import os 
 
-   #=========== SIMULATION DETAILS ========
-   projectname = "brownian_motion"
-   seed = -1
-   N_measurements = 10 #we want 10 measurements for each parameter combination
+```python
+import os 
 
-   measurements = range(N_measurements)
-   Ns = [ 1,10,100 ]
-   Ls = [ 0.5, 1.0, 2.0 ]
-   Ts = [ 0.5, 1.0, 2.0 ]
-   Vs = [ 0.5, 1.0, 2.0 ]
-   rs = [ 0.1, 0.2, 0.3 ]
-   runtimes = [ 10.0, 100.0, 1000.0 ]
-   x0s = [ 0., 0.5, 1.0 ] #in units of L
-   dts = [ 0.001, 0.01]
+#=========== SIMULATION DETAILS ========
+projectname = "brownian_motion"
+seed = -1
+N_measurements = 10 #we want 10 measurements for each parameter combination
 
-   #this will have BrownianMotions()'s function parameter names
-   external_parameters = [
-                           ( 'L', Ls   ),
-                           ( 'r', rs   ),
-                           ( None   , measurements ),
-                          ]
-   internal_parameters = [
-                           ('N', Ns),
-                           ('V', Vs[1:]),
-                           ('T', Ts),
-                          ]
-   standard_parameters = [
-                           ( 'dt', dts[1] ),
-                           ( 'x0', x0s[0] ),
-                           ( 'tmax', runtimes[-1] ),
-                          ]
-    #if this is true, only the simulation time will be saved and wrapped
-   only_save_times = False
+measurements = range(N_measurements)
+Ns = [ 1,10,100 ]
+Ls = [ 0.5, 1.0, 2.0 ]
+Ts = [ 0.5, 1.0, 2.0 ]
+Vs = [ 0.5, 1.0, 2.0 ]
+rs = [ 0.1, 0.2, 0.3 ]
+runtimes = [ 10.0, 100.0, 1000.0 ]
+x0s = [ 0., 0.5, 1.0 ] #in units of L
+dts = [ 0.001, 0.01]
 
-   #============== QUEUE ==================
-   queue = "SGE"
-   memory = "1G"
-   priority = 0
+#this will have BrownianMotions()'s function parameter names
+external_parameters = [
+                       ( 'L', Ls   ),
+                       ( 'r', rs   ),
+                       ( None   , measurements ),
+                      ]
+internal_parameters = [
+                       ('N', Ns),
+                       ('V', Vs[1:]),
+                       ('T', Ts),
+                      ]
+standard_parameters = [
+                       ( 'dt', dts[1] ),
+                       ( 'x0', x0s[0] ),
+                       ( 'tmax', runtimes[-1] ),
+                      ]
+#if this is true, only the simulation time will be saved and wrapped
+only_save_times = False
 
-   #============ CLUSTER SETTINGS ============
-   username = "user"
-   server = "server"
-   useratserver = username + u'@' + server
+#============== QUEUE ==================
+queue = "SGE"
+memory = "1G"
+priority = 0
 
-   shell = "/bin/bash"
-   pythonpath = "/usr/bin/python"
-   basename = "bm_const_dt"
-   name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
-   serverpath = "/home/"+username +"/"+ projectname + "/" + name 
-   resultpath = serverpath + "/results"
+#============ CLUSTER SETTINGS ============
+username = "user"
+server = "server"
+useratserver = username + u'@' + server
 
-   #=======================================
-   localpath = os.path.join(os.getcwd(),"results_"+name)
+shell = "/bin/bash"
+pythonpath = "/usr/bin/python"
+basename = "bm_const_dt"
+name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_save_times)
+serverpath = "/home/"+username +"/"+ projectname + "/" + name 
+resultpath = serverpath + "/results"
 
-   #========================
-   #since we need the updated source code of the brownian_motion module on the server,
-   #we add the git repo to get updated and installed.
-   git_repos = [
-                   ( "/home/"+username+"/brownian-motion", pythonpath + " setup.py install --user" )
-                ]
-   ```
+#=======================================
+localpath = os.path.join(os.getcwd(),"results_"+name)
+
+#========================
+#since we need the updated source code of the brownian_motion module on the server,
+#we add the git repo to get updated and installed.
+git_repos = [
+               ( "/home/"+username+"/brownian-motion", pythonpath + " setup.py install --user" )
+            ]
+```
 
 * ``.qsuite``
    
