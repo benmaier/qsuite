@@ -45,8 +45,8 @@ as per [digitalocean](https://www.digitalocean.com/docs/droplets/resources/troub
 ### Linux, Mac OSX
 
 ```bash
-$ sudo python setup.py install  #or
-$ sudo python3 setup.py install
+$ python setup.py install  #or
+$ python3 setup.py install
 ```
 
 ### Additional Mac OSX
