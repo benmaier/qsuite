@@ -199,7 +199,23 @@ def main():
         data_already_loaded = False
 
         if "numpy" in cmds or \
-           (any([c in cmds for c in ["meanerr","nanmeanerr","meanstd","nanmeanstd","defaultpercentiles","percentiles","quartiles"]]) and not os.path.exists("results.npy")):
+           (any([c in cmds for c in [
+                                     "meanerr",
+                                     "nanmeanerr",
+                                     "infmeanerr",
+                                     "meanstd",
+                                     "nanmeanstd",
+                                     "infmeanstd",
+                                     "defaultpercentiles",
+                                     "percentiles",
+                                     "quartiles",
+                                     "nandefaultpercentiles",
+                                     "nanpercentiles",
+                                     "nanquartiles",
+                                     "infdefaultpercentiles",
+                                     "infpercentiles",
+                                     "infquartiles",
+                                     ]]) and not os.path.exists("results.npy")):
 
             if not os.path.exists(os.path.join(cwd, "results.p")):
                 p = subprocess.Popen(["gzip", "-d", "results.p.gz"])
@@ -237,7 +253,22 @@ def main():
             if isinstance(axis,basestring) or axis is None:
                 axis = (cf.parameter_names+cf.internal_names).index(axis)
 
-            N = len((cf.external_parameters+cf.internal_parameters)[axis][1])
+            N = (~np.isnan(data)).sum(axis=axis)
+            mn, err = np.nanmean(data,axis=axis), np.nanstd(data,axis=axis)/np.sqrt(N)
+            print(mn)
+            np.savez("./results_mean_err.npz",mean=mn,err=err)
+
+        if "infmeanerr" in cmds:
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            _data = data.copy()
+            _data[np.isinf(_data)] = np.nan
+            N = (~np.isnan(_data)).sum(axis=axis)
             mn, err = np.nanmean(data,axis=axis), np.nanstd(data,axis=axis)/np.sqrt(N)
             np.savez("./results_mean_err.npz",mean=mn,err=err)
 
@@ -260,27 +291,46 @@ def main():
             if isinstance(axis,basestring) or axis is None:
                 axis = (cf.parameter_names+cf.internal_names).index(axis)
 
-            N = len((cf.external_parameters+cf.internal_parameters)[axis][1])
+            mn, err = np.nanmean(_data,axis=axis), np.nanstd(_data,axis=axis)
+            np.savez("./results_mean_std.npz",mean=mn,std=err)
+
+        if "infmeanstd" in cmds:
+            if not data_already_loaded:
+                data = np.load("results.npy")
+
+            axis = None
+            if isinstance(axis,basestring) or axis is None:
+                axis = (cf.parameter_names+cf.internal_names).index(axis)
+
+            _data = data.copy()
+            _data[np.isinf(_data)] = np.nan
             mn, err = np.nanmean(data,axis=axis), np.nanstd(data,axis=axis)
             np.savez("./results_mean_std.npz",mean=mn,std=err)
 
         percentiles_name = None
 
-        if "defaultpercentiles" in cmds:
-            percentiles_name = "defaultpercentiles"
-            cmds = ["percentiles"]
-            cmds.extend(["2.5","16","50","84","97.5"])
 
-        if "quartiles" in cmds:
-            percentiles_name = "quartiles"
-            cmds = ["percentiles"]
-            cmds.extend(["25","50","75"])
+        for prefix in ['','nan','inf']:
+            if prefix+"defaultpercentiles" in cmds:
+                percentiles_name = prefix+"defaultpercentiles"
+                cmds = [prefix+"percentiles"]
+                cmds.extend(["2.5","16","50","84","97.5"])
+                break
 
-        if "percentiles" in cmds:
+            if prefix+"quartiles" in cmds:
+                percentiles_name = prefix+"quartiles"
+                cmds = [prefix+"percentiles"]
+                cmds.extend(["25","50","75"])
+                break
 
+        if "percentiles" in cmds or\
+           "nanpercentiles" in cmds or\
+           "infpercentiles" in cmds:
+
+            ndx = max(cmds.index(cmd) for cmd in ["percentiles","nanpercentiles", "infpercentiles"] if cmd in cmds)
             if percentiles_name is None:
-                percentiles_name = "percentiles"
-            ndx = cmds.index("percentiles")
+                percentiles_name = cmd[ndx]
+
             percentiles = cmds[ndx+1:]
             if len(percentiles) == 0:
                 print("No percentiles provided. Please provide percentiles as list or use `defaultpercentiles` or `quartiles`")
@@ -294,7 +344,18 @@ def main():
             if isinstance(axis,basestring) or axis is None:
                 axis = (cf.parameter_names+cf.internal_names).index(axis)
 
-            data_percentiles = np.percentile(data, fperc, axis=axis)
+            if percentiles_name.startswith('inf'):
+                data[np.isinf(data)] = np.nan
+                ignore_nan = True
+            elif percentiles_name.startswith('nan'):
+                ignore_nan = True
+            else:
+                ignore_nan = False
+
+            if ignore_nan:
+                data_percentiles = np.nanpercentile(data, fperc, axis=axis)
+            else:
+                data_percentiles = np.percentile(data, fperc, axis=axis)
             results = {}
 
             for i, perc in enumerate(percentiles):
@@ -613,9 +674,8 @@ def main():
                     sftp_get_files(ssh,cf,files_dests)
                 else:
                     get_all =  len(args)>1 and args[1] in ["all","allresults"]
-
-                    pattern_res = re.compile(r'result.*\.p*$')
                     pattern_tim = re.compile(r'time.*\.p*$')
+                    pattern_res = re.compile(r'result.*\.p*$')
                     resultstring = ssh_command(ssh,"ls "+cf.resultpath)
                     resultstring = resultstring.replace("\n"," ")
                     resultlist = [ f for f in resultstring.split(" ") if (f!="" and not f.startswith(".")) ]
