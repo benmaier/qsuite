@@ -14,6 +14,8 @@ setup(name='qsuite',
         'paramiko>=2.7.2',
         'pathos>=0.2.7',
         'tabulate>=0.8.7',
+        'python_dotenv>=1.0.0',
+        'pathlib>=1.0.1',
       ],
       dependency_links=[
           ],
