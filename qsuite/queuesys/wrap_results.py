@@ -98,8 +98,14 @@ def wrap_results(is_local=False,localrespath="current_results"):
                     time = pickle.load(this_file)
 
                 if not cf.only_save_times:
-                    with open(resultpath+"/results_%d.p" % j,'rb') as this_file:
-                        res = pickle.load(this_file)
+                    if cf.save_each_run:
+                        res = []
+                        for j_internal in range(cf.jmax_internal+1):
+                            with open(resultpath+"/results_%d_%d.p" % (j,j_internal),'rb') as this_file:
+                                res.append(pickle.load(this_file))
+                    else:
+                        with open(resultpath+"/results_%d.p" % j,'rb') as this_file:
+                            res = pickle.load(this_file)
         else:
             if loading_successful:
                 print("*** Caught Exception: Files missing! Jobs with the following ARRAY IDs did not produce results:")

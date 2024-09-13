@@ -7,6 +7,7 @@ import traceback
 from numpy import mean
 from numpy import std
 from numpy import sqrt
+from pathlib import Path
 
 try:
     # Python 2
@@ -156,8 +157,8 @@ def job(j,resultpath=None,cf=None):
         t_start = time.time()
 
         try:
-            # start the simulation and save the result
-            results[ip] = simcode.simulation_code(kwargs)
+            # start the simulation
+            result = simcode.simulation_code(kwargs)
         except Exception as e:
             # in case there's an error, write that into the progress file
             if not is_local:
@@ -167,8 +168,13 @@ def job(j,resultpath=None,cf=None):
             traceback.print_exc(file=sys.stderr)
             sys.exit(1) 
 
+        # save or collect result
+        if cf.save_each_run:
+            save_pickle(result, cf.resultpath+'/results.p', [j, ip])
+        else: 
+            results[ip] = result
+
         t_end = time.time()
-        
         times[ip] = t_end - t_start
 
         if is_local:
@@ -180,16 +186,30 @@ def job(j,resultpath=None,cf=None):
             _update_progress_file(ip,N_int_param,times[:ip+1],_get_progress_fn(cf,j))
         
     #save results
-    if not os.path.exists(cf.resultpath):
-        os.mkdir(cf.resultpath)
+    Path(cf.resultpath).mkdir(exist_ok=True)
 
-    if any([result is not None for result in results]) and not cf.only_save_times:
-        with open(cf.resultpath+'/results_%d.p' % (j),'wb') as dumpfile:
-            pickle.dump(results,dumpfile,protocol=pickle.HIGHEST_PROTOCOL)
+    if not cf.save_each_run:
+        save_pickle(results, cf.resultpath+'/results.p', [j])
 
     #save times needed
-    with open(cf.resultpath+'/times_%d.p' % (j),'wb') as dumpfile:
-        pickle.dump(times,dumpfile,protocol=pickle.HIGHEST_PROTOCOL)
+    save_pickle(times, cf.resultpath+'/times.p', [j])
+
+
+def save_pickle(result, f_name, ids):
+    """write a result to a pickle file with the given filename and ids
+    - it incorporates the ids into the filename: path/to/result.p --> path/to/result_1_2.p
+
+    Args:
+        result (any): result to be saved
+        f_name (filepath): e.g. /home/MyUser/simulation/reslt.p
+        ids (list): list of ids, e.g.: [1,2] or [3]
+    """
+    f_name = Path(f_name) 
+    stem, suffix =  f_name.stem, f_name.suffix
+    ids = ['%d' % id for id in ids] # convert to digit string
+    f_name = f_name.parent / (stem + '_' + '_'.join(ids) + suffix)
+    with f_name.open('wb') as dumpfile:
+        pickle.dump(result, dumpfile, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__=="__main__":
