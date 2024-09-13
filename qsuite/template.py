@@ -52,6 +52,8 @@ def reset(mode):
 
 def copy_template(mode,options=[]):
 
+    if mode == "env":
+        filename = "env"
     if mode == "config":
         filename = "qsuite_config.py"
     elif mode == "simulation":

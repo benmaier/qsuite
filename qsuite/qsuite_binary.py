@@ -112,6 +112,7 @@ def qstat(cf,ssh,args):
 
 def init(qsuitefile,opts):
     qsuiteparser = get_qsuite(qsuitefile,init=True)
+    copy_template("env",opts)
     copy_template("config",opts)
     copy_template("simulation",opts)
     write_qsuite(qsuiteparser,qsuitefile)
