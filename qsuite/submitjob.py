@@ -16,12 +16,12 @@ def get_output_pattern(qname):
     """SLURM needs a different output pattern in its options"""
     s = "/output"
     if qname=="SLURM":
-        s+ = "/slurm-%A_%a.out"
+        s += "/slurm-%A_%a.out"
     return s
 
 def get_jobscript(cf,array_id=None):
     JOBSCRIPT = get_dummy(cf.queue)
-    out_pattern = get_output_pattern(qname)
+    out_pattern = get_output_pattern(cf.queue)
 
     if array_id is None:
         arr_id_min = cf.jmin+1

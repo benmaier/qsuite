@@ -6,6 +6,7 @@ basename = "experimentname"
 
 seed = -1
 N_measurements = 1
+save_each_run = False
 
 measurements = range(N_measurements)
 params1 = range(3)
@@ -50,7 +51,7 @@ resultpath = serverpath + "/results"
 #============ CLUSTER PREPARATION ====================================
 #====== e.g. bash code loading modules to enable python:    ==========
 #======   "ml +development/24.04 +GCCcore/13.3.0 +Python"   ==========
-server_cmds = ""
+server_cmds = " "
 
 
 #============== LOCAL SETTINGS ============

@@ -32,6 +32,8 @@ def reset(mode):
 
     if mode == "config":
         filename = "qsuite_config.py"
+    elif mode == "env":
+        filename = "env"
     elif mode == "simulation":
         filename = "simulation.py"
     elif mode == "customwrap":
@@ -52,10 +54,10 @@ def reset(mode):
 
 def copy_template(mode,options=[]):
 
-    if mode == "env":
-        filename = "env"
     if mode == "config":
         filename = "qsuite_config.py"
+    elif mode == "env":
+        filename = "env"
     elif mode == "simulation":
         filename = "simulation.py"
     elif mode == "customwrap":
@@ -87,6 +89,8 @@ def set_default_file(mode,sourcefile):
 
     if mode == "config":
         filename = "qsuite_config.py"
+    elif mode == "env":
+        filename = "env"
     elif mode == "simulation":
         filename = "simulation.py"
     elif mode == "customwrap":
