@@ -32,8 +32,10 @@ standard_parameters = [
 
 only_save_times = False
 
-#============== QUEUE ==================
-queue = "SGE"
+#============== QUEUE =============================================
+#=============== set queing system used at your server          ===
+#=============== queue can be one of ['PBS', 'SGE', 'SLURM']    ===
+queue = "SLURM"
 memory = "1G"
 priority = 0
 
@@ -50,7 +52,7 @@ resultpath = serverpath + "/results"
 
 #============ CLUSTER PREPARATION ====================================
 #====== e.g. bash code loading modules to enable python:    ==========
-#======   "ml +development/24.04 +GCCcore/13.3.0 +Python"   ==========
+#======   "ml purge; ml +development/24.04 +GCCcore/13.3.0 +Python"   ==========
 server_cmds = " "
 
 

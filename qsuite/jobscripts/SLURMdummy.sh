@@ -1,7 +1,7 @@
 #!%s
 
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=%s
+#SBATCH --mem-per-cpu=%s
 #SBATCH --array=%d-%d
 #SBATCH -o %s
 #SBATCH -e %s
