@@ -62,5 +62,5 @@ n_local_cpus = 1
 
 #========================
 git_repos = [
-                ( "/path/to/repo", pythonpath + " setup.py install --user" )
+                ( "/path/to/repo", pythonpath + " -m pip install -e . --user" )
             ]
