@@ -68,7 +68,8 @@ def update_git(cf,ssh):
 
 
 def wrap_results(cf,ssh):
-    ssh_command(ssh, "cd " + cf.serverpath + "; " + cf.pythonpath + " wrap_results.py;")
+    ssh_command(ssh, "cd " + cf.serverpath + "; " +
+                cf.server_cmds + "; " + cf.pythonpath + " wrap_results.py;")
     ssh_command(ssh, "cd " + cf.serverpath + "/results; gzip results.p" )
     ssh_command(ssh, "cd " + cf.serverpath + "/results; gzip times.p" )
     custom_wrap_results(cf,ssh)
