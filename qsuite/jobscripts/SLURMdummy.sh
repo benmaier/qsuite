@@ -11,4 +11,4 @@
 %s
 
 INDEX=$((SLURM_ARRAY_TASK_ID-1))
-srun %s %s/job.py $INDEX
+srun %s -u %s/job.py $INDEX

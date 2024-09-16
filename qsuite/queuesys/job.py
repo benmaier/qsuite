@@ -157,8 +157,11 @@ def job(j,resultpath=None,cf=None):
         t_start = time.time()
 
         try:
-            # start the simulation
-            result = simcode.simulation_code(kwargs)
+            if cf.save_each_run: # loaf if computed in former run
+                result = load_pickle(cf.resultpath+'/results.p', [j, ip])
+                result = simcode.simulation_code(kwargs) if result is None else result
+            else: # start the simulation
+                result = simcode.simulation_code(kwargs)
         except Exception as e:
             # in case there's an error, write that into the progress file
             if not is_local:
@@ -195,19 +198,35 @@ def job(j,resultpath=None,cf=None):
     save_pickle(times, cf.resultpath+'/times.p', [j])
 
 
-def save_pickle(result, f_name, ids):
-    """write a result to a pickle file with the given filename and ids
-    - it incorporates the ids into the filename: path/to/result.p --> path/to/result_1_2.p
-
-    Args:
-        result (any): result to be saved
-        f_name (filepath): e.g. /home/MyUser/simulation/reslt.p
-        ids (list): list of ids, e.g.: [1,2] or [3]
+def _get_result_path(f_name, ids):
+    """it incorporates the ids into the filename:
+        path/to/result.p --> path/to/result_1_2.p
     """
     f_name = Path(f_name) 
     stem, suffix =  f_name.stem, f_name.suffix
     ids = ['%d' % id for id in ids] # convert to digit string
     f_name = f_name.parent / (stem + '_' + '_'.join(ids) + suffix)
+    return f_name
+
+
+def load_pickle(f_name, ids):
+    f_name = _get_result_path(f_name, ids)
+    if not f_name.exists():
+        return None
+    else:
+        with f_name.open('rb') as dumpfile:
+            return pickle.load(dumpfile)
+
+
+def save_pickle(result, f_name, ids):
+    """write a result to a pickle file with the given filename and ids
+    - it incorporates the ids into the filename: path/to/result.p --> path/to/result_1_2.p
+    Args:
+        result (any): result to be saved
+        f_name (filepath): e.g. /home/MyUser/simulation/reslt.p
+        ids (list): list of ids, e.g.: [1,2] or [3]
+    """
+    f_name = _get_result_path(f_name, ids)
     with f_name.open('wb') as dumpfile:
         pickle.dump(result, dumpfile, protocol=pickle.HIGHEST_PROTOCOL)
 
