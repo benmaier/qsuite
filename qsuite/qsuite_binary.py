@@ -490,6 +490,7 @@ def main():
                 jobids = range(N_jobs)
                 respath = "current_results"
 
+                global local_job
                 def local_job(j_id,N_jobs=None,respath=None,cf=None):
                     print(j_id+1,"/",N_jobs)
                     job(j_id,respath,cf)
@@ -505,13 +506,14 @@ def main():
 
                 partial_job = partial(local_job,N_jobs=N_jobs,respath=respath,cf=cf)
                 print("Starting local job with", ncpu, "CPUs")
-                pool = Pool(ncpu)    
-                pool.map(partial_job,jobids)
+                #pool = Pool(ncpu)
+                with Pool(ncpu) as pool:
+                    pool.map(partial_job,jobids)
 
                 from qsuite.queuesys.wrap_results import wrap_results as _wrap
                 _wrap(is_local=True,localrespath=respath)
 
-            sys.exit(0)     
+            #sys.exit(0)
 
         elif cmd in param_cmds:
             cf = qconfig(qsuiteparser=qsuiteparser)
