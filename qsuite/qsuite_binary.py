@@ -486,8 +486,20 @@ def main():
 
             elif cmd == "local":
 
+                cmds = args[1:]
                 N_jobs = cf.get_number_of_jobs()
-                jobids = range(N_jobs)
+                if len(cmds) > 0:
+                    array_ids = [ int(c) if ("-" not in c) else [ int(rangeid) for rangeid in c.split("-") ] for c in cmds]
+                    print("Using Array IDs "+str(array_ids)+". Beware! Array IDs start counting at 1.")
+                    jobids = []
+                    for array_id in array_ids:
+                        if isinstance(array_id, list):
+                            jobids.extend(range(array_id[0]-1, array_id[1]))
+                        else:
+                            jobids.append(array_id-1)
+                else:
+                    jobids = range(N_jobs)
+
                 respath = "current_results"
 
                 global local_job

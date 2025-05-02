@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qsuite',
-      version='0.4.14',
+      version='0.4.15',
       description='A CLI to submit and retrieve large-scale jobs/results to and from HPC clusters.',
       url='https://github.com/benmaier/qsuite',
       author='Benjamin F. Maier',
