@@ -555,7 +555,9 @@ def main():
                     ssh_cmds + sftp_cmds + customwrap_cmds + get_cmds + qstatus_cmds + err_cmds:
 
             cf = qconfig(qsuiteparser=qsuiteparser)
-            ssh = ssh_connect(cf)
+
+            if cmd not in wrap_cmds or "local" not in args[1:]:
+                ssh = ssh_connect(cf)
 
             # replace directory keyword with path
             for iarg, arg in enumerate(args):
@@ -591,7 +593,7 @@ def main():
                             last_id = 0
                             for j in range(len(cf.parameter_list)):
                                 print(j,progresses[j][0].upper())
-                                if any( kw in progresses[j][-1].upper() or kw in progresses[j][0].upper() for kw in key_words ):                                    
+                                if any( kw in progresses[j][-1].upper() or kw in progresses[j][0].upper() for kw in key_words ):
                                     array_id.append(j+1)
 
                             print(array_id)
@@ -618,7 +620,7 @@ def main():
                     update_git(cf,ssh)
 
                 make_job_ready(cf,ssh,array_id)
-                
+
                 if array_id is None:
                     wrap_local(cf)
 
@@ -628,7 +630,6 @@ def main():
             elif cmd in wrap_cmds:
                 if len(args) == 1:
                     wrap_results(cf,ssh)
-                    ssh_command
                 elif args[1] == "local":
                     respath = 'current_results'
                     from qsuite.queuesys.wrap_results import wrap_results as _wrap
