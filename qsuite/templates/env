@@ -1,0 +1,2 @@
+pkey_file="/path/to/keyfile/id_rsa"
+password="password_of_keyfile_or_delete_this_line_if_no_password"

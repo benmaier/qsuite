@@ -63,6 +63,9 @@ class qconfig(object):
         self.jmin = 0
         self.jmax = len(self.parameter_list)-1
 
+        #get max # of internal runs
+        self.jmax_internal = len(self.internal_parameter_list)-1
+
     #======================== INHERIT PROPERTIES FROM THE CONFIG FILE ============================
 
     def get_cf(self,path):

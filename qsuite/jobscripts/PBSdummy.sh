@@ -11,5 +11,8 @@
 # within PBS job (workaround for SGE option "-cwd")
 cd $PBS_O_WORKDIR
 
+# here go "server_cmds": server specific commands necessary to run the job 
+%s
+
 INDEX=$((PBS_ARRAYID-1))
 %s %s/job.py $INDEX

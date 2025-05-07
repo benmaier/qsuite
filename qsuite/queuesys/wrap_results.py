@@ -2,6 +2,7 @@ from __future__ import print_function
 from numpy import *
 import os
 import sys
+from pathlib import Path
 #import gzip
 
 try:
@@ -90,7 +91,11 @@ def wrap_results(is_local=False,localrespath="current_results"):
         else:
             pcoords = []
 
-        if os.path.exists(resultpath+"/times_%d.p" % j) and os.path.exists(resultpath+"/results_%d.p" % j):
+        if cf.save_each_run:
+            results_exists = len(list(Path(resultpath).glob("results_%d_*.p" % j))) == cf.jmax_internal+1
+        else:
+            results_exists = os.path.exists(resultpath+"/results_%d.p" % j)
+        if os.path.exists(resultpath+"/times_%d.p" % j) and results_exists:
 
             if loading_successful:
 
@@ -98,8 +103,14 @@ def wrap_results(is_local=False,localrespath="current_results"):
                     time = pickle.load(this_file)
 
                 if not cf.only_save_times:
-                    with open(resultpath+"/results_%d.p" % j,'rb') as this_file:
-                        res = pickle.load(this_file)
+                    if cf.save_each_run:
+                        res = []
+                        for j_internal in range(cf.jmax_internal+1):
+                            with open(resultpath+"/results_%d_%d.p" % (j,j_internal),'rb') as this_file:
+                                res.append(pickle.load(this_file))
+                    else:
+                        with open(resultpath+"/results_%d.p" % j,'rb') as this_file:
+                            res = pickle.load(this_file)
         else:
             if loading_successful:
                 print("*** Caught Exception: Files missing! Jobs with the following ARRAY IDs did not produce results:")
@@ -143,7 +154,11 @@ def wrap_results(is_local=False,localrespath="current_results"):
         for j in range(cf.jmax+1):
             os.remove(resultpath+"/times_%d.p" % j)
             if not cf.only_save_times:
-                os.remove(resultpath+"/results_%d.p" % j)
+                if cf.save_each_run:
+                    for j_internal in range(cf.jmax_internal+1):
+                        os.remove(resultpath+"/results_%d_%d.p" % (j,j_internal))
+                else:
+                    os.remove(resultpath+"/results_%d.p" % j)
     else: 
         i = 0
         missing_array_id_strings = []

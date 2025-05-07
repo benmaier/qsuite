@@ -3,6 +3,8 @@ import paramiko
 import select
 import os
 import sys
+from dotenv import dotenv_values
+from pathlib import Path
 
 def ssh_command(ssh,command,noprint=False):
     """
@@ -53,7 +55,7 @@ def ssh_command(ssh,command,noprint=False):
             if not noprint:
                 sys.stdout.write(received)
 
-                
+
     if (last_line is not None) and (last_line != "") and (not last_line.endswith("\n")):
         if not noprint:
             sys.stdout.write(last_line+"\n")
@@ -72,10 +74,11 @@ def ssh_connect(cf):
     http://sebastiandahlgren.se/2012/10/11/using-paramiko-to-send-ssh-commands/
     """
     try:
+        key = get_ssh_key()
         ssh = paramiko.SSHClient()
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(cf.server,username=cf.username)
+        ssh.connect(cf.server,username=cf.username, pkey=key)
         print("Connected to %s" % cf.server)
     except paramiko.AuthenticationException as e:
         print("Authentication failed when connecting to %s" % cf.server)
@@ -88,11 +91,49 @@ def ssh_connect(cf):
 
     return ssh
 
+
+def get_ssh_key():
+    """loads the ssh-key:
+            if .env exists: from entries in .env
+                - use RSA or Ed25519 depending on name
+            elif ~/.ssh/id_rsa_groot: use this one
+    """
+    f_env = Path.cwd() / '.env'
+
+    # ======== determine key-file ========
+    f_default_key = Path('~/.ssh/id_rsa_groot').expanduser()
+    with_pw = False
+    if f_env.exists():
+        env_variables = dotenv_values('.env')
+        if Path(env_variables['pkey_file']).exists():
+            f_key = Path(env_variables['pkey_file'])
+        if 'password' in env_variables.keys():
+            with_pw = True
+    elif f_default_key.exists():
+        f_key = f_default_key
+    else:
+        raise FileNotFoundError("No valid key found in .env or ~/.ssh/id_rsa_groot")
+
+    # ======== determine key-method ========
+    if 'ed25519' in f_key.parts[-1].lower():
+        key_method = paramiko.Ed25519Key
+    elif 'rsa' in f_key.parts[-1].lower():
+        key_method = paramiko.RSAKey
+    else:
+        raise ValueError("No valid key [ed25519, rsa] found in .env --> either rename key or add new key-detection-method")
+
+    # ======== load key with or without pw ========
+    if with_pw:
+        key = key_method.from_private_key_file(f_key, password=env_variables['password'])
+    else:
+        key = key_method.from_private_key_file(f_key)
+    return key
+
 def print_progress(transferred, toBeTransferred):
     progress = transferred / float(toBeTransferred)
     _update_progress(progress)
 
-def _update_progress(progress, bar_length=40, status=""):        
+def _update_progress(progress, bar_length=40, status=""):
     """
     This function was coded by Marc Wiedermann (https://github.com/marcwie)
 
@@ -123,7 +164,7 @@ def sftp_put_files(ssh,cf,files_destinations):
     #            "mkdir -p "+cf.serverpath+"; "+\
     #            "mkdir -p "+cf.resultpath+"; "+\
     #            "mkdir -p "+cf.serverpath+"/output")
-    
+
     #additional_directories = set([cf.serverpath, cf.resultpath, cf.serverpath+"/output"])
     all_directories = set()
     mkdir_p_string = "mkdir -p "+cf.serverpath+"/output; mkdir -p "+cf.resultpath+"; "

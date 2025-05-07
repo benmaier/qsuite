@@ -12,8 +12,16 @@ def get_dummy(qname):
 
     return s
 
+def get_output_pattern(qname):
+    """SLURM needs a different output pattern in its options"""
+    s = "/output"
+    if qname=="SLURM":
+        s += "/slurm-%A_%a.out"
+    return s
+
 def get_jobscript(cf,array_id=None):
     JOBSCRIPT = get_dummy(cf.queue)
+    out_pattern = get_output_pattern(cf.queue)
 
     if array_id is None:
         arr_id_min = cf.jmin+1
@@ -30,9 +38,10 @@ def get_jobscript(cf,array_id=None):
                 cf.memory,
                 arr_id_min,
                 arr_id_max,
-                cf.serverpath+"/output",
-                cf.serverpath+"/output",
+                cf.serverpath + out_pattern,
+                cf.serverpath + out_pattern,
                 cf.priority,
+                cf.server_cmds,
                 cf.pythonpath,
                 cf.serverpath,
                 )
@@ -70,10 +79,7 @@ def make_job_ready(cf,ssh,array_id=None):
     joblocal_names = []
 
     if type(array_id) is not list and type(array_id) is not tuple:
-        is_list = True
         array_id = [ array_id ]
-    else:
-        is_list = False
 
     for a_id in array_id:
         jobscript = get_jobscript(cf,a_id)
@@ -126,6 +132,11 @@ def start_job(cf,ssh,array_id=None):
         elif cf.queue=="PBS":
             ssh_command(ssh,"cd " +cf.serverpath+";\
                              jobID=`qsub " + cf.basename + suffix +"`;\
+                             echo $jobID > .jobid;")
+        elif cf.queue=="SLURM":
+            ssh_command(ssh,"cd " +cf.serverpath+";\
+                             jobID=`sbatch " + cf.basename + suffix +"`;\
+                             jobID=`echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`;\
                              echo $jobID > .jobid;")
         else:
             print("Unknown queue:",cf.queue)

@@ -2,52 +2,49 @@
 
 Provides a general framework to submit array jobs on an SGE (Sun Grid Engine) or a PBS (Portable Batch System) queueing system with multiple parameters and multiple measurements. Includes easy collection, possible costumized preprocessing and download of the jobs' results.
 
+After the installation, a common qsuite workflow is:
+
+```bash
+# 1. make a directory for your scans, and go there 2. initiallize qsuite
+$ mkdir my_para_scan1; cd my_para_scan1
+$ qsuite init
+# modify the 3 just created files 
+# * env:              put your ssh-key and password, then hide it
+# * qsuite_config.py: specify parameter and server settings
+# * simulation.py:    add your simulation function
+# now: 1. submit job, 2. check progress, 3. wrap results, 4. download results
+$ qsuite submit
+$ qsuite stat
+$ qsuite wrap
+$ qsuite get all
+```
+
+
 ## Install
 
-In order for `qsuite` to function properly, you have to implement an automatic login to your compute cluster. Say your username there is `quser` and the cluster address is `qclust`. On your local machine, your username is `localuser`.
+The following is adapted from [compendium.hpc.tu-dresen.de](https://compendium.hpc.tu-dresden.de/access/ssh_login/).
+In order for `qsuite` to function properly, you have to implement an automatic login to your compute cluster. Say your username there is `you` and the cluster address is `remote.server.de`. On your local machine, your username is `you@local`.
 
-The following is adapted from [linuxproblem.org](http://www.linuxproblem.org/art_9.html). The first you have to do is to generate a pair of RSA authentication keys like it's done in the following. Note that in the current version of qsuite rsa files encrypted with a passphrase are not supported, so you shouldn't add one when you're using the commands below.
-
-```bash
-localuser$ ssh-keygen -t rsa
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/localuser/.ssh/id_rsa): 
-Created directory '/home/localuser/.ssh'.
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /home/localuser/.ssh/id_rsa.
-Your public key has been saved in /home/localuser/.ssh/id_rsa.pub.
-The key fingerprint is:
-ab:cd:1e:4e quser@qclust
-```
-
-Now create an `.ssh` directory on the remote machine
+First create a SSH key pair (either with or without pw)
 
 ```bash
-localuser$ ssh quser@qclust mkdir -p "~/.ssh"
+you@local$ mkdir -p ~/.ssh
+you@local$ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 ```
 
-and append your public key from your lcoal machine to the authorized key file on the cluster
+Now send the login information to your remote server (note: if you have no `ssh-copy-id` command: go to this [section](#ssh-connection-without-ssh-copy-id))
 
 ```bash
-localuser$ cat ~/.ssh/id_rsa.pub | ssh quser@qclust "cat >> ~/.ssh/authorized_keys"
+you@local$ ssh-copy-id -i ~/.ssh/id_ed25519.pub you@remote.server.de
 ```
 
-Note the following: "Both the host and the client should have the following permissions and owners:
+qsuite currently **only** supports **RSA** and **ED25519** keys. If you need another keytype, feel free to implement it(should be easy if supported by `paramiko`).
 
-* `~/.ssh` permissions should be 700 (`cd ~; chmod 700 .ssh`)
-* `~/.ssh` should be owned by your account
-* `~/.ssh/authorized_keys` permissions should be 600 (`cd ~/.ssh; chmod 600 authorized_keys`)
-* `~/.ssh/authorized_keys` should be owned by your account"
+NOTEs:
+* **tell qsuite which file**: later on you can create a hidden `.env` file and specify the key and password to use
+  * **default-key**: to be compatible with older versions, if you have no `.env` file, qsuite assumes there is a `~/.ssh/id_rsa_groot` key-file
+* **key-file-name**: The name of your id file should contain the key-type in order for qsuite to know what to do. (e.g. id_rsa_blabla for `RSA` or id_ed25519_bla for `ED225519`)
 
-as per [digitalocean](https://www.digitalocean.com/docs/droplets/resources/troubleshooting-ssh/authentication/).
-
-### Linux, Mac OSX
-
-```bash
-$ python setup.py install  #or
-$ python3 setup.py install
-```
 
 ### Additional Mac OSX
 
@@ -129,7 +126,7 @@ $ mkdir brownian; cd brownian
 $ qsuite init
 ```
 
-Three files appeared in your directory.
+Four files appeared in your directory [`simulation.py`, `qsuite_config.py`, `env`, `.qsuite`].
 
 * `simulation.py`
    
@@ -162,6 +159,8 @@ import os
 projectname = "brownian_motion"
 seed = -1
 N_measurements = 10 #we want 10 measurements for each parameter combination
+save_each_run = False #activate, if your simulation output is large (~ 200 MB)
+
 
 measurements = range(N_measurements)
 Ns = [ 1,10,100 ]
@@ -209,16 +208,33 @@ name = basename + "_NMEAS_" + str(N_measurements) + "_ONLYSAVETIME_" + str(only_
 serverpath = "/home/"+username +"/"+ projectname + "/" + name 
 resultpath = serverpath + "/results"
 
-#=======================================
+#============ CLUSTER PREPARATION ==================================================
+#======  bash code loading modules to enable python:                      ==========
+#======  e.g. "ml purge; ml +development/24.04 +GCCcore/13.3.0 +Python"   ==========
+server_cmds = " "
+
+#============== LOCAL SETTINGS  ============
 localpath = os.path.join(os.getcwd(),"results_"+name)
 
-#========================
+#============= GIT SETTINGS     ============
 #since we need the updated source code of the brownian_motion module on the server,
 #we add the git repo to get updated and installed.
 git_repos = [
-               ( "/home/"+username+"/brownian-motion", pythonpath + " setup.py install --user" )
+               ( "/home/"+username+"/brownian-motion", server_cmds + "; " + pythonpath + " setup.py install --user" )
             ]
 ```
+
+* `env`
+
+  This file the path to your ssh-key and its password.
+  1. change the values
+  2. hide it by running `mv env .env`
+  The default file looks like:
+  
+  ```bash
+  pkey_file="/path/to/keyfile/id_rsa"
+  password="password_of_keyfile_or_delete_this_line_if_no_password"
+  ```
 
 * ``.qsuite``
    
@@ -453,6 +469,16 @@ $ qsuite qstat job  #shows the status of the current job
 
 Alternatives to `qstat` are `stat` and `status`.
 
+### Dealing with Timeouts and large output files
+
+If the result of a simulation is very large, you don't want it to occupy memory but save it.
+In order to do so set in your `qsuite_config.py` the parameter
+
+```python
+save_each_run=True
+```
+The cool thing is: if you run into time-out problems, restarting the whole simulation via `qsuite submit` will continue where the time-out happened --> not much time is lost.
+
 ### Estimate the size of the produced data
 
 ```bash
@@ -536,3 +562,38 @@ with open('results_mean_err.npz','rb') as f:
 ```
 
 Then, the new arrays carry the data in the desired order. Also works on the original pickled list.
+
+## Install problems
+
+
+### SSH connection without ssh-copy-id
+
+if no ssh-copy-id is available you have to copy it by yourself
+
+Now create an `.ssh` directory on the remote machine
+
+```bash
+you@local$ ssh you@remote.server.de mkdir -p "~/.ssh"
+```
+
+and append your public key from your lcoal machine to the authorized key file on the cluster
+
+```bash
+you@local$ cat ~/.ssh/id_rsa.pub | ssh you@remote.server.de "cat >> ~/.ssh/authorized_keys"
+```
+
+Note the following: "Both the host and the client should have the following permissions and owners:
+
+* `~/.ssh` permissions should be 700 (`cd ~; chmod 700 .ssh`)
+* `~/.ssh` should be owned by your account
+* `~/.ssh/authorized_keys` permissions should be 600 (`cd ~/.ssh; chmod 600 authorized_keys`)
+* `~/.ssh/authorized_keys` should be owned by your account"
+
+as per [digitalocean](https://www.digitalocean.com/docs/droplets/resources/troubleshooting-ssh/authentication/).
+
+### Linux, Mac OSX
+
+```bash
+$ python setup.py install  #or
+$ python3 setup.py install
+```

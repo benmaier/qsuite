@@ -15,6 +15,9 @@ fi
 export OMP_NUM_THREADS=1
 export USE_SIMPLE_THREADED_LEVEL3=1
 
+# here go "server_cmds": server specific commands necessary to run the job 
+%s
+
 INDEX=$((SGE_TASK_ID-1))
 %s %s/job.py $INDEX
 
